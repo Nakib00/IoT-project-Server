@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Login View -->
+    <div id="login-view" class="view">
+        <div class="form-wrapper">
+            <h2>Welcome Back!</h2>
+            <p class="subtitle">Log in to access your dashboard.</p>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p class="switch-view">Don't have an account? <a href="#" id="show-register">Sign up</a></p>
+            <p id="login-message" class="message"></p>
+        </div>
+    </div>
+
+    <!-- Register View -->
+    <div id="register-view" class="view hidden">
+        <div class="form-wrapper">
+            <h2>Create Your Account</h2>
+            <p class="subtitle">Join our platform today.</p>
+            <form id="register-form">
+                <input type="text" id="register-name" placeholder="Full Name" required>
+                <input type="email" id="register-email" placeholder="Email Address" required>
+                <input type="tel" id="register-phone" placeholder="Phone Number" required>
+                <input type="password" id="register-password" placeholder="Password" required>
+                <button type="submit">Create Account</button>
+            </form>
+            <p class="switch-view">Already have an account? <a href="#" id="show-login">Log in</a></p>
+            <p id="register-message" class="message"></p>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="view hidden">
+        <div class="dashboard-container">
+            <header class="dashboard-header">
+                <h1 id="welcome-message">Welcome, User!</h1>
+                <button id="logout-btn" class="secondary-btn">Logout</button>
+            </header>
+
+            <div class="card token-card">
+                <h3>Device Authentication Token</h3>
+                <p>Use this token in your ESP32 code to securely connect to the server.</p>
+                <div class="token-display">
+                    <code id="user-token"></code>
+                    <button id="copy-token-btn">Copy</button>
+                </div>
+                <button id="regenerate-token-btn">Generate New Token</button>
+            </div>
+
+            <div class="card chart-card">
+                <h3>Live Temperature Data</h3>
+                <canvas id="temp-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

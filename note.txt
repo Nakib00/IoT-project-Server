@@ -1,0 +1,198 @@
+My IoT Platform: ESP32 Connection Guide
+Last Updated: July 21, 2025
+
+1. Introduction
+Welcome, ESP32 developer! This guide provides the exact steps to connect your ESP32-based IoT device to our platform. By following these instructions, you will be able to send sensor data from your device and have it stored and visualized in real-time.
+
+This guide assumes you have already been provided with the server address and a unique authentication token from the platform administrator.
+
+2. Prerequisites
+Before you begin, ensure you have the following ready:
+
+Hardware:
+
+An ESP32 development board.
+
+A sensor you wish to connect (e.g., a DHT11 temperature sensor).
+
+A Micro-USB cable.
+
+Software (on your computer):
+
+Arduino IDE installed.
+
+ESP32 Board Support configured in the Arduino IDE.
+
+The following Arduino libraries installed via the Library Manager (Sketch > Include Library > Manage Libraries...):
+
+WebSockets by Markus Sattler
+
+ArduinoJson by Benoit Blanchon
+
+(Optional) Any libraries specific to your sensor, like DHT sensor library by Adafruit.
+
+3. Connection Credentials
+To connect your device, you will need three key pieces of information. The platform administrator should have provided you with #2 and #3.
+
+Your Wi-Fi Credentials: The SSID (name) and password for the Wi-Fi network your device will use.
+
+The Server IP Address: The local IP address of the server (e.g., 192.168.1.10).
+
+Your Authentication Token: A unique string of characters that identifies your device (e.g., 0d4fe9c7-c1cd-4a4e-975a-6d2c4c36a9d8).
+
+4. The Arduino Code
+Copy and paste the following code into a new sketch in your Arduino IDE. This code is the complete template for connecting and sending data.
+
+#include <WiFi.h>
+#include <WebSocketsClient.h>
+#include <ArduinoJson.h>
+
+// ===================================================
+// --- CONFIGURE YOUR SETTINGS HERE ---
+// ===================================================
+
+// 1. Your Wi-Fi Credentials
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+// 2. Your Server's IP Address (provided by administrator)
+const char* websockets_host = "YOUR_COMPUTER_IP_ADDRESS";
+const uint16_t websockets_port = 3000;
+
+// 3. Your Authentication Token (provided by administrator)
+const char* authToken = "PASTE_YOUR_TOKEN_HERE";
+
+// ===================================================
+
+WebSocketsClient webSocket;
+
+// --- This function simulates a sensor. ---
+// --- Replace its content with your actual sensor code. ---
+float getTemperature() {
+  // Example for a real sensor: return dht.readTemperature();
+  // For this template, we send a random value between 20.0 and 30.0
+  return 20.0 + (rand() % 100) / 10.0;
+}
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+  switch(type) {
+    case WStype_DISCONNECTED:
+      Serial.printf("[WSc] Disconnected!\n");
+      break;
+    case WStype_CONNECTED:
+      Serial.printf("[WSc] Connected to server!\n");
+      // Send authentication token to the server
+      {
+        StaticJsonDocument<100> authDoc;
+        authDoc["token"] = authToken;
+        String authString;
+        serializeJson(authDoc, authString);
+        webSocket.sendTXT(authString);
+      }
+      break;
+    case WStype_TEXT:
+      Serial.printf("[WSc] Server response: %s\n", payload);
+      // If the server confirms authentication, you'll see it here.
+      break;
+    default:
+      break;
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi...");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi Connected.");
+  Serial.print("ESP32 IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  webSocket.begin(websockets_host, websockets_port, "/");
+  webSocket.onEvent(webSocketEvent);
+  webSocket.setReconnectInterval(5000); // Try to reconnect every 5 seconds
+}
+
+void loop() {
+  webSocket.loop();
+
+  static unsigned long lastSendTime = 0;
+  if (millis() - lastSendTime > 10000) { // Send data every 10 seconds
+    lastSendTime = millis();
+    if (webSocket.isConnected()) {
+      float temp = getTemperature();
+      
+      StaticJsonDocument<100> dataDoc;
+      dataDoc["temperature"] = temp;
+      
+      String dataString;
+      serializeJson(dataDoc, dataString);
+      
+      webSocket.sendTXT(dataString);
+      Serial.printf("Sent data to server: %s\n", dataString.c_str());
+    }
+  }
+}
+
+5. Configuration and Uploading
+Fill in Your Details: In the code you just pasted, carefully replace the placeholder values in the configuration section:
+
+YOUR_WIFI_SSID: Your Wi-Fi network name.
+
+YOUR_WIFI_PASSWORD: Your Wi-Fi password.
+
+YOUR_COMPUTER_IP_ADDRESS: The server IP address given to you.(ipconfig
+
+Windows IP Configuration
+
+Ethernet adapter Ethernet:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::42b2:bb52:b99d:b1d5%8
+   IPv4 Address. . . . . . . . . . . : 192.168.0.100
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.0.1)
+
+PASTE_YOUR_TOKEN_HERE: The unique authentication token given to you.
+
+Connect Your ESP32: Plug your ESP32 into your computer via USB.
+
+Select Board and Port: In the Arduino IDE, go to Tools and make sure the correct Board (e.g., "ESP32 Dev Module") and Port are selected.
+
+Upload: Click the Upload button (the arrow icon).
+
+6. Testing and Verification
+To confirm your device is working correctly, open the Serial Monitor (Tools > Serial Monitor or the magnifying glass icon). Set the baud rate to 115200.
+
+You should see the following sequence of messages:
+
+Connecting to WiFi...
+WiFi Connected.
+ESP32 IP Address: [Your ESP32's IP]
+[WSc] Connected to server!
+[WSc] Server response: {"status":"authenticated"}
+Sent data to server: {"temperature":25.70}
+Sent data to server: {"temperature":22.30}
+...
+
+If you see the "authenticated" status and the "Sent data" messages, your device is successfully connected and transmitting data to the platform.
+
+7. Troubleshooting
+Stuck at "Connecting to WiFi...": Double-check your Wi-Fi SSID and password. Ensure your device is within range of the router.
+
+Serial Monitor shows [WSc] Disconnected!:
+
+Confirm the websockets_host IP address is correct.
+
+Ensure your ESP32 and the server are on the same local network.
+
+The server might be down. Contact your platform administrator.
+
+Server response is {"status":"authentication failed"}:
+
+Your authToken is incorrect. Copy it again carefully from the source and paste it into your code. The token may have been regenerated, so ask the administrator for the new one.
