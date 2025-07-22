@@ -18,13 +18,12 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
+    padding: 20px 0;
 }
 
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
 .view {
     width: 100%;
@@ -58,7 +57,10 @@ h2 {
 input[type="text"],
 input[type="email"],
 input[type="tel"],
-input[type="password"] {
+input[type="password"],
+input[type="number"],
+select,
+textarea {
     width: 100%;
     padding: 12px;
     margin-bottom: 16px;
@@ -66,9 +68,11 @@ input[type="password"] {
     border-radius: 8px;
     box-sizing: border-box;
     font-size: 1rem;
+    background-color: #FFF;
+    font-family: 'Inter', sans-serif;
 }
 
-input:focus {
+input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
@@ -87,9 +91,7 @@ button {
     transition: background-color 0.2s;
 }
 
-button:hover {
-    background-color: var(--primary-hover);
-}
+button:hover { background-color: var(--primary-hover); }
 
 .switch-view {
     margin-top: 24px;
@@ -108,11 +110,8 @@ button:hover {
     min-height: 20px;
 }
 
-/* Dashboard Styles */
-.dashboard-container {
-    width: 100%;
-    max-width: 900px;
-}
+/* Dashboard */
+.dashboard-container { width: 100%; max-width: 1000px; }
 
 .dashboard-header {
     display: flex;
@@ -121,20 +120,15 @@ button:hover {
     margin-bottom: 24px;
 }
 
-#welcome-message {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-}
+#welcome-message { font-size: 2rem; font-weight: 700; margin: 0; }
 
 .secondary-btn {
     background-color: var(--border-color);
     color: var(--text-color);
+    width: auto;
+    padding: 8px 16px;
 }
-
-.secondary-btn:hover {
-    background-color: #D1D5DB;
-}
+.secondary-btn:hover { background-color: #D1D5DB; }
 
 .card {
     background: var(--card-background);
@@ -144,10 +138,54 @@ button:hover {
     margin-bottom: 24px;
 }
 
-.card h3 {
-    margin-top: 0;
-    font-size: 1.25rem;
+.card h3 { margin-top: 0; font-size: 1.25rem; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
 }
+.form-grid .full-width { grid-column: 1 / -1; }
+.form-grid input, .form-grid textarea { margin-bottom: 0; }
+
+/* Projects List */
+.projects-list-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+.project-card {
+    background: var(--card-background);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.project-header h4 { margin: 0; font-size: 1.4rem; }
+.project-header .dev-board {
+    background-color: var(--background-color);
+    color: var(--subtle-text);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.project-description { color: var(--subtle-text); margin-bottom: 20px; }
 
 .token-display {
     display: flex;
@@ -158,19 +196,35 @@ button:hover {
     border-radius: 8px;
     margin: 16px 0;
 }
-
 .token-display code {
     flex-grow: 1;
     word-wrap: break-word;
+    font-family: monospace;
     font-size: 0.9rem;
 }
+.token-display button { width: auto; padding: 8px 16px; font-size: 0.9rem; }
 
-.token-display button, #regenerate-token-btn {
-    width: auto;
-    padding: 8px 16px;
-    font-size: 0.9rem;
+.graphs-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
 }
 
-.chart-card {
-    padding: 24px;
+.sensor-graph-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.sensor-edit-form { margin-bottom: 16px; }
+.sensor-edit-form .form-grid { grid-template-columns: 1fr 1fr 1fr; }
+.sensor-edit-form button { font-size: 0.9rem; padding: 8px 12px; width: auto; }
+
+@media (max-width: 768px) {
+    .sensor-edit-form .form-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .graphs-container { grid-template-columns: 1fr; }
 }

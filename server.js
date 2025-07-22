@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
@@ -15,26 +14,40 @@ const PORT = 3000;
 const USERS_DB_PATH = path.join(__dirname, 'users.json');
 
 // --- Helper Functions ---
-
-// Function to read the users database
 const readUsersDB = () => {
-    if (!fs.existsSync(USERS_DB_PATH)) {
-        fs.writeFileSync(USERS_DB_PATH, JSON.stringify([]));
+    // This function is now more robust to prevent crashes from an empty/corrupt users.json
+    try {
+        if (!fs.existsSync(USERS_DB_PATH)) {
+            // If file doesn't exist, create it with an empty array
+            fs.writeFileSync(USERS_DB_PATH, JSON.stringify([]));
+            return [];
+        }
+
+        const fileContent = fs.readFileSync(USERS_DB_PATH, 'utf8');
+        
+        // If the file exists but is empty, return an empty array
+        if (fileContent.trim() === '') {
+            return [];
+        }
+
+        // Otherwise, parse the content
+        return JSON.parse(fileContent);
+    } catch (error) {
+        console.error("Fatal error reading or parsing users.json:", error);
+        // If there's a parsing error (corrupt file), return an empty array to prevent a crash
+        return [];
     }
-    const data = fs.readFileSync(USERS_DB_PATH);
-    return JSON.parse(data);
 };
 
-// Function to write to the users database
 const writeUsersDB = (users) => {
     fs.writeFileSync(USERS_DB_PATH, JSON.stringify(users, null, 2));
 };
 
 // --- Middleware ---
 app.use(bodyParser.json());
-app.use(express.static('public')); // Serve static files from 'public' directory
+app.use(express.static('public'));
 
-// --- API Endpoints for User Management ---
+// --- API Endpoints ---
 
 // Register a new user
 app.post('/register', (req, res) => {
@@ -42,26 +55,13 @@ app.post('/register', (req, res) => {
     if (!name || !email || !phone || !password) {
         return res.status(400).json({ message: 'All fields are required.' });
     }
-
     const users = readUsersDB();
     if (users.find(user => user.email === email)) {
         return res.status(400).json({ message: 'A user with this email already exists.' });
     }
-
-    // Create the new user object with an empty data array
-    const newUser = {
-        id: uuidv4(),
-        name,
-        email,
-        phone,
-        password, // In a real app, you MUST hash the password!
-        token: uuidv4(),
-        data: [] // Initialize with an empty array for sensor data
-    };
-
+    const newUser = { id: uuidv4(), name, email, phone, password, projects: [] };
     users.push(newUser);
     writeUsersDB(users);
-
     console.log(`User registered: ${name} (${email})`);
     res.status(201).json({ message: 'User registered successfully!' });
 });
@@ -71,96 +71,155 @@ app.post('/login', (req, res) => {
     const { email, password } = req.body;
     const users = readUsersDB();
     const user = users.find(u => u.email === email && u.password === password);
-
     if (user) {
         console.log(`User logged in: ${user.name}`);
-        res.json({ 
-            message: 'Login successful!', 
-            token: user.token,
-            name: user.name
-        });
+        res.json({ message: 'Login successful!', name: user.name, email: user.email });
     } else {
         res.status(401).json({ message: 'Invalid email or password.' });
     }
 });
 
-// Get user data for the dashboard
-app.get('/data/:token', (req, res) => {
-    const { token } = req.params;
-    const users = readUsersDB();
-    const user = users.find(u => u.token === token);
-
-    if (user) {
-        // Return the data array for the specific user
-        res.json(user.data || []);
-    } else {
-        res.status(404).json({ message: 'Invalid token.' });
+// Create a new project
+app.post('/create-project', (req, res) => {
+    const { email, projectName, description, developmentBoard, sensorCount } = req.body;
+    if (!email || !projectName || !description || !developmentBoard || sensorCount === undefined) {
+        return res.status(400).json({ message: 'All project fields are required.' });
     }
+    const users = readUsersDB();
+    const userIndex = users.findIndex(user => user.email === email);
+    if (userIndex === -1) return res.status(404).json({ message: 'User not found.' });
+
+    // Create initial sensor data slots
+    const sensordata = [];
+    for (let i = 1; i <= sensorCount; i++) {
+        sensordata.push({
+            id: `sensor_${i}`,
+            title: `Sensor ${i}`,
+            typeOfPin: 'Analog',
+            pinNumber: `A${i-1}`,
+            data: []
+        });
+    }
+
+    const newProject = {
+        projectName,
+        description,
+        developmentBoard,
+        sensorCount: Number(sensorCount),
+        token: uuidv4(),
+        sensordata
+    };
+
+    if (!users[userIndex].projects) users[userIndex].projects = [];
+    users[userIndex].projects.push(newProject);
+    writeUsersDB(users);
+    console.log(`Project created for ${users[userIndex].name}: ${projectName}`);
+    res.status(201).json({ message: 'Project created successfully!', project: newProject });
 });
 
-// Regenerate a user's token
-app.post('/regenerate-token', (req, res) => {
-    const { currentToken } = req.body;
+// Get all projects for a user
+app.get('/user-projects/:email', (req, res) => {
+    const { email } = req.params;
     const users = readUsersDB();
-    const userIndex = users.findIndex(u => u.token === currentToken);
-
-    if (userIndex !== -1) {
-        const newToken = uuidv4();
-        users[userIndex].token = newToken;
-        writeUsersDB(users); // Just update the token in the main DB
-
-        console.log(`Token regenerated for user: ${users[userIndex].name}`);
-        res.json({ message: 'Token regenerated successfully!', newToken: newToken });
+    const user = users.find(u => u.email === email);
+    if (user) {
+        res.json(user.projects || []);
     } else {
         res.status(404).json({ message: 'User not found.' });
     }
 });
 
+// Get data for a specific project token
+app.get('/data/:token', (req, res) => {
+    const { token } = req.params;
+    const users = readUsersDB();
+    for (const user of users) {
+        const project = user.projects?.find(p => p.token === token);
+        if (project) {
+            return res.json(project.sensordata || []);
+        }
+    }
+    res.status(404).json({ message: 'Invalid project token.' });
+});
 
-// --- WebSocket Server for ESP32 Communication ---
+// UPDATE SENSOR INFO
+app.post('/update-sensor-info', (req, res) => {
+    const { token, sensorId, title, typeOfPin, pinNumber } = req.body;
+    if (!token || !sensorId || !title || !typeOfPin || !pinNumber) {
+        return res.status(400).json({ message: 'All sensor fields are required.' });
+    }
+
+    const users = readUsersDB();
+    let projectFound = false;
+    for (const user of users) {
+        const project = user.projects?.find(p => p.token === token);
+        if (project) {
+            const sensor = project.sensordata?.find(s => s.id === sensorId);
+            if (sensor) {
+                sensor.title = title;
+                sensor.typeOfPin = typeOfPin;
+                sensor.pinNumber = pinNumber;
+                projectFound = true;
+                break;
+            }
+        }
+    }
+
+    if (projectFound) {
+        writeUsersDB(users);
+        res.json({ message: 'Sensor updated successfully!' });
+    } else {
+        res.status(404).json({ message: 'Project or Sensor not found.' });
+    }
+});
+
+
+// --- WebSocket Server ---
 wss.on('connection', (ws) => {
     console.log('Client connected to WebSocket');
 
     ws.on('message', (message) => {
         try {
-            const data = JSON.parse(message);
-            console.log('Received from ESP32:', data);
+            const incomingData = JSON.parse(message);
+            console.log('Received from ESP32:', incomingData);
 
-            if (data.token) {
+            // --- Authentication Logic ---
+            if (incomingData.token && incomingData.action === 'auth') {
                 const users = readUsersDB();
-                if (users.some(u => u.token === data.token)) {
+                if (users.some(u => u.projects?.some(p => p.token === incomingData.token))) {
                     ws.isAuthenticated = true;
-                    ws.token = data.token;
+                    ws.token = incomingData.token;
                     ws.send(JSON.stringify({ status: 'authenticated' }));
-                    console.log(`Device authenticated with token: ${ws.token.substring(0,8)}...`);
+                    console.log(`Device authenticated: ${ws.token.substring(0, 8)}...`);
                 } else {
                     ws.send(JSON.stringify({ status: 'authentication failed' }));
                     ws.terminate();
                 }
-            } else if (ws.isAuthenticated && data.temperature !== undefined) {
-                // --- THIS IS THE NEW DATA SAVING LOGIC ---
-                // NOTE: Reading and writing the entire file on every message is inefficient
-                // for a large-scale application. A database is recommended for production.
+            } 
+            // --- Data Saving Logic ---
+            else if (ws.isAuthenticated && incomingData.action === 'data') {
                 const users = readUsersDB();
-                const userIndex = users.findIndex(u => u.token === ws.token);
-
-                if (userIndex !== -1) {
-                    const newDataPoint = {
-                        datetime: new Date().toISOString(),
-                        data: data.temperature // Save the temperature under the 'data' key
-                    };
-                    
-                    // Add the new data point to the user's data array
-                    users[userIndex].data.push(newDataPoint);
-
-                    // Optional: Keep the data array from growing too large
-                    if (users[userIndex].data.length > 100) {
-                        users[userIndex].data.shift(); // Remove the oldest entry
+                for (const user of users) {
+                    const project = user.projects?.find(p => p.token === ws.token);
+                    if (project) {
+                        // incomingData.payload should be an array of sensor values, e.g., [25.5, 60.1]
+                        const sensorValues = incomingData.payload;
+                        
+                        project.sensordata.forEach((sensor, index) => {
+                            if (sensorValues[index] !== undefined) {
+                                const newDataPoint = {
+                                    datetime: new Date().toISOString(),
+                                    value: sensorValues[index]
+                                };
+                                sensor.data.push(newDataPoint);
+                                if (sensor.data.length > 100) sensor.data.shift();
+                            }
+                        });
+                        
+                        writeUsersDB(users);
+                        console.log(`Saved data for project: ${project.projectName}`);
+                        break; 
                     }
-                    
-                    // Write the entire updated database back to the file
-                    writeUsersDB(users);
-                    console.log(`Saved data for user: ${users[userIndex].name}`);
                 }
             }
         } catch (error) {
@@ -168,12 +227,10 @@ wss.on('connection', (ws) => {
         }
     });
 
-    ws.on('close', () => {
-        console.log('Client disconnected');
-    });
+    ws.on('close', () => console.log('Client disconnected'));
 });
 
-// --- Start the Server ---
-server.listen(PORT, () => {
+// --- Start Server ---
+server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
