@@ -15,26 +15,18 @@ const USERS_DB_PATH = path.join(__dirname, 'users.json');
 
 // --- Helper Functions ---
 const readUsersDB = () => {
-    // This function is now more robust to prevent crashes from an empty/corrupt users.json
     try {
         if (!fs.existsSync(USERS_DB_PATH)) {
-            // If file doesn't exist, create it with an empty array
             fs.writeFileSync(USERS_DB_PATH, JSON.stringify([]));
             return [];
         }
-
         const fileContent = fs.readFileSync(USERS_DB_PATH, 'utf8');
-        
-        // If the file exists but is empty, return an empty array
         if (fileContent.trim() === '') {
             return [];
         }
-
-        // Otherwise, parse the content
         return JSON.parse(fileContent);
     } catch (error) {
         console.error("Fatal error reading or parsing users.json:", error);
-        // If there's a parsing error (corrupt file), return an empty array to prevent a crash
         return [];
     }
 };
@@ -89,7 +81,6 @@ app.post('/create-project', (req, res) => {
     const userIndex = users.findIndex(user => user.email === email);
     if (userIndex === -1) return res.status(404).json({ message: 'User not found.' });
 
-    // Create initial sensor data slots
     const sensordata = [];
     for (let i = 1; i <= sensorCount; i++) {
         sensordata.push({
@@ -142,7 +133,7 @@ app.get('/data/:token', (req, res) => {
     res.status(404).json({ message: 'Invalid project token.' });
 });
 
-// UPDATE SENSOR INFO
+// Update sensor info
 app.post('/update-sensor-info', (req, res) => {
     const { token, sensorId, title, typeOfPin, pinNumber } = req.body;
     if (!token || !sensorId || !title || !typeOfPin || !pinNumber) {
@@ -183,7 +174,6 @@ wss.on('connection', (ws) => {
             const incomingData = JSON.parse(message);
             console.log('Received from ESP32:', incomingData);
 
-            // --- Authentication Logic ---
             if (incomingData.token && incomingData.action === 'auth') {
                 const users = readUsersDB();
                 if (users.some(u => u.projects?.some(p => p.token === incomingData.token))) {
@@ -196,25 +186,24 @@ wss.on('connection', (ws) => {
                     ws.terminate();
                 }
             } 
-            // --- Data Saving Logic ---
             else if (ws.isAuthenticated && incomingData.action === 'data') {
                 const users = readUsersDB();
                 for (const user of users) {
                     const project = user.projects?.find(p => p.token === ws.token);
                     if (project) {
-                        // incomingData.payload should be an array of sensor values, e.g., [25.5, 60.1]
-                        const sensorValues = incomingData.payload;
+                        const sensorValues = incomingData.payload; // e.g., {"A0": 25.5, "A1": 450}
                         
-                        project.sensordata.forEach((sensor, index) => {
-                            if (sensorValues[index] !== undefined) {
+                        for (const pin in sensorValues) {
+                            const sensor = project.sensordata.find(s => s.pinNumber === pin);
+                            if (sensor) {
                                 const newDataPoint = {
                                     datetime: new Date().toISOString(),
-                                    value: sensorValues[index]
+                                    value: sensorValues[pin]
                                 };
                                 sensor.data.push(newDataPoint);
                                 if (sensor.data.length > 100) sensor.data.shift();
                             }
-                        });
+                        }
                         
                         writeUsersDB(users);
                         console.log(`Saved data for project: ${project.projectName}`);

@@ -16,8 +16,8 @@
           {
             "id": "sensor_1",
             "title": "Dth11",
-            "typeOfPin": "Digital",
-            "pinNumber": "d1",
+            "typeOfPin": "Analog",
+            "pinNumber": "A0",
             "data": []
           },
           {
