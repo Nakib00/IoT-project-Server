@@ -74,6 +74,34 @@
     "email": "nakib@gmail.com",
     "phone": "01627199815",
     "password": "12345",
-    "projects": []
+    "projects": [
+      {
+        "projectId": "bd26c72c-c463-4eb1-bd43-baeb68068e48",
+        "projectName": "Home Automation V2",
+        "description": "This is an updated description for my test project.",
+        "developmentBoard": "ESP32-S2",
+        "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
+        "createdAt": "2025-07-23T10:27:16.839Z",
+        "updatedAt": "2025-07-23T11:46:23.558Z",
+        "sensordata": [
+          {
+            "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
+            "title": "Temperature Sensor (DHT22)",
+            "typeOfPin": "Digital",
+            "pinNumber": "D4",
+            "graphInfo": {
+              "title": "Real-time DHT11",
+              "type": "line",
+              "maxDataPoints": 10,
+              "xAxisLabel": "Time",
+              "yAxisLabel": "Value"
+            },
+            "createdAt": "2025-07-23T10:46:26.949Z",
+            "updatedAt": "2025-07-23T11:10:40.115Z",
+            "data": []
+          }
+        ]
+      }
+    ]
   }
 ]
