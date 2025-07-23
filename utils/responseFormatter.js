@@ -1,4 +1,4 @@
-// utils/responseFormatter.js
+
 
 /**
  * Formats the API response.

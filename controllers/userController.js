@@ -1,4 +1,4 @@
-// controllers/userController.js
+
 const UserModel = require('../models/userModel');
 const {
     formatResponse
