@@ -28,6 +28,105 @@
             "data": []
           }
         ]
+      },
+      {
+        "projectName": "fg",
+        "description": "sfgsd",
+        "developmentBoard": "gsfd",
+        "sensorCount": 3,
+        "token": "6e5c47c0-6915-4482-8874-2f96f138fa85",
+        "sensordata": [
+          {
+            "id": "sensor_1",
+            "title": "Sensor 1",
+            "typeOfPin": "Analog",
+            "pinNumber": "A0",
+            "data": []
+          },
+          {
+            "id": "sensor_2",
+            "title": "Sensor 2",
+            "typeOfPin": "Analog",
+            "pinNumber": "A1",
+            "data": []
+          },
+          {
+            "id": "sensor_3",
+            "title": "Sensor 3",
+            "typeOfPin": "Analog",
+            "pinNumber": "A2",
+            "data": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "4605d0cd-bf7b-408c-8c77-fb9f1a479826",
+    "name": "memo",
+    "email": "memo@gmail.com",
+    "phone": "123456",
+    "password": "12345",
+    "projects": [
+      {
+        "projectName": "test",
+        "description": "this is a test",
+        "developmentBoard": "esp",
+        "sensorCount": 1,
+        "token": "96cd7dde-3df9-4fb8-8edd-2710b0888f5e",
+        "sensordata": [
+          {
+            "id": "sensor_1",
+            "title": "Dht11",
+            "typeOfPin": "Analog",
+            "pinNumber": "D0",
+            "graphInfo": {
+              "title": "Real-Time Temperature",
+              "type": "bar",
+              "maxDataPoints": 5,
+              "xAxisLabel": "Timestamp",
+              "yAxisLabel": "Temp (°C)"
+            },
+            "data": [
+              {
+                "datetime": "2025-07-22T18:32:52.295Z",
+                "value": 533.56
+              },
+              {
+                "datetime": "2025-07-22T18:33:02.316Z",
+                "value": 549.47
+              },
+              {
+                "datetime": "2025-07-22T18:33:12.265Z",
+                "value": 658.13
+              },
+              {
+                "datetime": "2025-07-22T18:33:22.297Z",
+                "value": 853.62
+              },
+              {
+                "datetime": "2025-07-22T18:33:32.334Z",
+                "value": 668.11
+              },
+              {
+                "datetime": "2025-07-22T18:33:42.368Z",
+                "value": 724.59
+              },
+              {
+                "datetime": "2025-07-22T18:33:52.300Z",
+                "value": 766.32
+              },
+              {
+                "datetime": "2025-07-22T18:34:02.336Z",
+                "value": 748.57
+              },
+              {
+                "datetime": "2025-07-22T18:34:12.374Z",
+                "value": 728.97
+              }
+            ]
+          }
+        ]
       }
     ]
   }

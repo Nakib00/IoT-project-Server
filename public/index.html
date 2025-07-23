@@ -17,7 +17,6 @@
             <h2>Welcome Back!</h2>
             <p class="subtitle">Log in to access your dashboard.</p>
             <form id="login-form">
-                <!-- Added name="email" and name="password" -->
                 <input type="email" id="login-email" name="email" placeholder="Email" required>
                 <input type="password" id="login-password" name="password" placeholder="Password" required>
                 <button type="submit">Login</button>
@@ -33,7 +32,6 @@
             <h2>Create Your Account</h2>
             <p class="subtitle">Join our platform today.</p>
             <form id="register-form">
-                <!-- Added name attributes to all inputs -->
                 <input type="text" id="register-name" name="name" placeholder="Full Name" required>
                 <input type="email" id="register-email" name="email" placeholder="Email Address" required>
                 <input type="tel" id="register-phone" name="phone" placeholder="Phone Number" required>
@@ -58,7 +56,6 @@
                 <h3>Create a New Project</h3>
                 <form id="create-project-form">
                     <div class="form-grid">
-                        <!-- Added name attributes to match server-side logic -->
                         <input type="text" id="project-name" name="projectName" placeholder="Project Name" required>
                         <input type="text" id="dev-board" name="developmentBoard" placeholder="Development Board (e.g., ESP32)" required>
                         <textarea id="project-description" name="description" class="full-width" placeholder="Description" required rows="2"></textarea>

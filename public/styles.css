@@ -21,6 +21,7 @@ body {
     align-items: flex-start;
     min-height: 100vh;
     padding: 20px 0;
+    box-sizing: border-box;
 }
 
 .hidden { display: none !important; }
@@ -31,6 +32,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .form-wrapper {
@@ -70,6 +72,7 @@ textarea {
     font-size: 1rem;
     background-color: #FFF;
     font-family: 'Inter', sans-serif;
+    transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -118,6 +121,8 @@ button:hover { background-color: var(--primary-hover); }
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 #welcome-message { font-size: 2rem; font-weight: 700; margin: 0; }
@@ -147,7 +152,7 @@ button:hover { background-color: var(--primary-hover); }
     margin-bottom: 16px;
 }
 .form-grid .full-width { grid-column: 1 / -1; }
-.form-grid input, .form-grid textarea { margin-bottom: 0; }
+.form-grid input, .form-grid textarea, .form-grid select { margin-bottom: 0; }
 
 /* Projects List */
 .projects-list-container h2 {
@@ -198,7 +203,7 @@ button:hover { background-color: var(--primary-hover); }
 }
 .token-display code {
     flex-grow: 1;
-    word-wrap: break-word;
+    word-break: break-all;
     font-family: monospace;
     font-size: 0.9rem;
 }
@@ -206,7 +211,7 @@ button:hover { background-color: var(--primary-hover); }
 
 .graphs-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 24px;
     margin-top: 24px;
 }
@@ -218,13 +223,18 @@ button:hover { background-color: var(--primary-hover); }
 }
 
 .sensor-edit-form { margin-bottom: 16px; }
-.sensor-edit-form .form-grid { grid-template-columns: 1fr 1fr 1fr; }
+.sensor-edit-form .form-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
 .sensor-edit-form button { font-size: 0.9rem; padding: 8px 12px; width: auto; }
 
 @media (max-width: 768px) {
-    .sensor-edit-form .form-grid { grid-template-columns: 1fr; }
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
+
 @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
     .graphs-container { grid-template-columns: 1fr; }
+    .form-wrapper { padding: 20px; }
 }
