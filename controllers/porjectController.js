@@ -173,6 +173,27 @@ const updateSensorInfo = (req, res) => {
     }
 };
 
+const getSensorById = (req, res) => {
+    const {
+        sensorId
+    } = req.params;
+    const sensor = UserModel.findSensorById(sensorId);
+
+    if (sensor) {
+        // Sort the data array by datetime in descending order
+        if (sensor.data && Array.isArray(sensor.data)) {
+            sensor.data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+        }
+
+        res.json(formatResponse(true, 200, 'Sensor data fetched successfully', {
+            sensor
+        }));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Sensor not found.'));
+    }
+};
+
+
 const deleteSensorById = (req, res) => {
     const {
         sensorId
@@ -253,6 +274,7 @@ module.exports = {
     updateProject,
     addSensorToProject,
     updateSensorInfo,
+    getSensorById,
     deleteSensorById,
     updateGraphInfo,
     getUserProjects,

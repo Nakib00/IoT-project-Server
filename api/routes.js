@@ -16,6 +16,7 @@ router.delete('/project/:projectId', porjectController.deleteProjectById);
 
 router.post('/add-sensor/:projectId', porjectController.addSensorToProject);
 router.put('/update-sensor/:sensorId', porjectController.updateSensorInfo);
+router.get('/sensor/:sensorId', porjectController.getSensorById);
 router.delete('/sensor/:sensorId', porjectController.deleteSensorById);
 
 router.put('/update-graph-info/:sensorId', porjectController.updateGraphInfo);

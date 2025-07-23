@@ -214,6 +214,19 @@ const updateSensorById = (sensorId, sensorData) => {
     return null;
 };
 
+const findSensorById = (sensorId) => {
+    const users = readUsersDB();
+    for (const user of users) {
+        for (const project of user.projects || []) {
+            const sensor = project.sensordata?.find(s => s.id === sensorId);
+            if (sensor) {
+                return sensor;
+            }
+        }
+    }
+    return null;
+};
+
 const deleteSensorById = (sensorId) => {
     const users = readUsersDB();
     let sensorFound = false;
@@ -336,6 +349,7 @@ module.exports = {
     findUserByEmail,
     findUserById,
     findProjectById,
+    findSensorById,
     createUser,
     createProjectForUser,
     updateProjectById,
