@@ -1,67 +1,5 @@
 [
   {
-    "id": "7085cdad-fe2b-4a90-951a-b7bf6fc51605",
-    "name": "Nakib",
-    "email": "nakib@gamil.com",
-    "phone": "01627199815",
-    "password": "12345678",
-    "projects": [
-      {
-        "projectName": "Temp",
-        "description": "HII",
-        "developmentBoard": "Esp32",
-        "sensorCount": 2,
-        "token": "0d8ae381-d55f-432f-9027-80171598edcd",
-        "sensordata": [
-          {
-            "id": "sensor_1",
-            "title": "Dth11",
-            "typeOfPin": "Analog",
-            "pinNumber": "A0",
-            "data": []
-          },
-          {
-            "id": "sensor_2",
-            "title": "Sensor 2",
-            "typeOfPin": "Analog",
-            "pinNumber": "A1",
-            "data": []
-          }
-        ]
-      },
-      {
-        "projectName": "fg",
-        "description": "sfgsd",
-        "developmentBoard": "gsfd",
-        "sensorCount": 3,
-        "token": "6e5c47c0-6915-4482-8874-2f96f138fa85",
-        "sensordata": [
-          {
-            "id": "sensor_1",
-            "title": "Sensor 1",
-            "typeOfPin": "Analog",
-            "pinNumber": "A0",
-            "data": []
-          },
-          {
-            "id": "sensor_2",
-            "title": "Sensor 2",
-            "typeOfPin": "Analog",
-            "pinNumber": "A1",
-            "data": []
-          },
-          {
-            "id": "sensor_3",
-            "title": "Sensor 3",
-            "typeOfPin": "Analog",
-            "pinNumber": "A2",
-            "data": []
-          }
-        ]
-      }
-    ]
-  },
-  {
     "id": "4605d0cd-bf7b-408c-8c77-fb9f1a479826",
     "name": "memo",
     "email": "memo@gmail.com",
@@ -129,5 +67,13 @@
         ]
       }
     ]
+  },
+  {
+    "id": "c66d3c99-b7c5-4396-96a2-b3ad485c57ab",
+    "name": "Nakib",
+    "email": "nakib@gmail.com",
+    "phone": "01627199815",
+    "password": "12345",
+    "projects": []
   }
 ]
