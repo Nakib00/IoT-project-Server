@@ -140,5 +140,13 @@
         ]
       }
     ]
+  },
+  {
+    "id": "6fe4eb8c-8933-4e93-bc41-a44ab23fc0e5",
+    "name": "Admin",
+    "email": "admin@gmail.com",
+    "phone": "0162719981",
+    "password": "12345678",
+    "projects": []
   }
 ]

@@ -4,6 +4,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const apiRoutes = require('./api/routes');
 const UserModel = require('./models/userModel'); 
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,6 +16,7 @@ const PORT = 3000;
 
 // --- Middleware ---
 // Use the built-in Express middleware for parsing JSON bodies
+app.use(cors());
 app.use(express.json()); 
 app.use(express.static('public'));
 
