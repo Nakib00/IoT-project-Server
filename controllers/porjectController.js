@@ -232,7 +232,7 @@ const updateGraphInfo = (req, res) => {
 
     // --- Validation for graph type ---
     if (type) {
-        const validTypes = ['line', 'bar', 'scatter'];
+        const validTypes = ['line', 'bar', 'scatter', 'area', 'composed'];
         if (!validTypes.includes(type)) {
             return res.status(400).json(formatResponse(false, 400, `Invalid graph type. Must be one of: ${validTypes.join(', ')}.`));
         }
