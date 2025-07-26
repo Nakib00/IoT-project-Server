@@ -76,6 +76,7 @@
     "password": "12345",
     "projects": [
       {
+<<<<<<< HEAD
         "projectId": "880f74b8-8d74-44fd-9ff9-fb289ad80902",
         "projectName": "Test",
         "description": "fdfdf",
@@ -84,6 +85,70 @@
         "createdAt": "2025-07-25T18:12:50.489Z",
         "updatedAt": "2025-07-25T18:12:50.489Z",
         "sensordata": []
+=======
+        "projectId": "bd26c72c-c463-4eb1-bd43-baeb68068e48",
+        "projectName": "Home Automation V2",
+        "description": "This is an updated description for my test project.",
+        "developmentBoard": "ESP32-S2",
+        "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
+        "createdAt": "2025-07-23T10:27:16.839Z",
+        "updatedAt": "2025-07-26T11:06:24.816Z",
+        "sensordata": [
+          {
+            "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
+            "title": "Temperature Sensor",
+            "typeOfPin": "Digital",
+            "pinNumber": "D4",
+            "graphInfo": {
+              "title": "Real-time DHT11",
+              "type": "area",
+              "maxDataPoints": 10,
+              "xAxisLabel": "Time",
+              "yAxisLabel": "Values"
+            },
+            "createdAt": "2025-07-23T10:46:26.949Z",
+            "updatedAt": "2025-07-26T11:06:24.816Z",
+            "data": [
+              {
+                "datetime": "2025-07-22T18:32:52.295Z",
+                "value": 533.56
+              },
+              {
+                "datetime": "2025-07-22T18:33:02.316Z",
+                "value": 549.47
+              },
+              {
+                "datetime": "2025-07-22T18:33:12.265Z",
+                "value": 658.13
+              },
+              {
+                "datetime": "2025-07-22T18:33:22.297Z",
+                "value": 853.62
+              },
+              {
+                "datetime": "2025-07-22T18:33:32.334Z",
+                "value": 668.11
+              },
+              {
+                "datetime": "2025-07-22T18:33:42.368Z",
+                "value": 724.59
+              },
+              {
+                "datetime": "2025-07-22T18:33:52.300Z",
+                "value": 766.32
+              },
+              {
+                "datetime": "2025-07-22T18:34:02.336Z",
+                "value": 748.57
+              },
+              {
+                "datetime": "2025-07-22T18:34:12.374Z",
+                "value": 728.97
+              }
+            ]
+          }
+        ]
+>>>>>>> c2cbc27baaf86abf735939a9c2e05b98ebabaf8d
       }
     ]
   }
