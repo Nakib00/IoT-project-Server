@@ -76,16 +76,6 @@
     "password": "12345",
     "projects": [
       {
-<<<<<<< HEAD
-        "projectId": "880f74b8-8d74-44fd-9ff9-fb289ad80902",
-        "projectName": "Test",
-        "description": "fdfdf",
-        "developmentBoard": "ESP32",
-        "token": "ea53daf4-5665-44b1-a60b-8185f6caf5a5",
-        "createdAt": "2025-07-25T18:12:50.489Z",
-        "updatedAt": "2025-07-25T18:12:50.489Z",
-        "sensordata": []
-=======
         "projectId": "bd26c72c-c463-4eb1-bd43-baeb68068e48",
         "projectName": "Home Automation V2",
         "description": "This is an updated description for my test project.",
@@ -148,8 +138,15 @@
             ]
           }
         ]
->>>>>>> c2cbc27baaf86abf735939a9c2e05b98ebabaf8d
       }
     ]
+  },
+  {
+    "id": "6fe4eb8c-8933-4e93-bc41-a44ab23fc0e5",
+    "name": "Admin",
+    "email": "admin@gmail.com",
+    "phone": "0162719981",
+    "password": "12345678",
+    "projects": []
   }
 ]
