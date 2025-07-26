@@ -82,22 +82,22 @@
         "developmentBoard": "ESP32-S2",
         "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
         "createdAt": "2025-07-23T10:27:16.839Z",
-        "updatedAt": "2025-07-23T11:46:23.558Z",
+        "updatedAt": "2025-07-26T11:06:24.816Z",
         "sensordata": [
           {
             "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
-            "title": "Temperature Sensor (DHT22)",
+            "title": "Temperature Sensor",
             "typeOfPin": "Digital",
             "pinNumber": "D4",
             "graphInfo": {
               "title": "Real-time DHT11",
-              "type": "line",
+              "type": "area",
               "maxDataPoints": 10,
               "xAxisLabel": "Time",
-              "yAxisLabel": "Value"
+              "yAxisLabel": "Values"
             },
             "createdAt": "2025-07-23T10:46:26.949Z",
-            "updatedAt": "2025-07-23T11:10:40.115Z",
+            "updatedAt": "2025-07-26T11:06:24.816Z",
             "data": [
               {
                 "datetime": "2025-07-22T18:32:52.295Z",
