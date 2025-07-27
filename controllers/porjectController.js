@@ -3,6 +3,7 @@ const {
     formatResponse
 } = require('../utils/responseFormatter');
 
+// Creates a new project for a user.
 const createProject = (req, res) => {
     const {
         userId
@@ -26,6 +27,144 @@ const createProject = (req, res) => {
     }
 };
 
+// Creates a new sending signal group within a project.
+const createSendingSignal = (req, res) => {
+    const {
+        projectId
+    } = req.params;
+    const {
+        title,
+        buttons
+    } = req.body;
+
+    if (!title || !buttons || !Array.isArray(buttons) || buttons.length === 0) {
+        return res.status(400).json(formatResponse(false, 400, 'Request body must contain a title and a non-empty array of buttons.'));
+    }
+
+    const newSignal = UserModel.createSendingSignalForProject(projectId, {
+        title,
+        buttons
+    });
+
+    if (newSignal) {
+        res.status(201).json(formatResponse(true, 201, 'Sending signal created successfully!', {
+            signal: newSignal
+        }));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Project not found.'));
+    }
+};
+
+// Updates the title of a sending signal.
+const updateSignalTitle = (req, res) => {
+    const {
+        signalId
+    } = req.params;
+    const {
+        title
+    } = req.body;
+
+    if (!title) {
+        return res.status(400).json(formatResponse(false, 400, 'The "title" field is required.'));
+    }
+
+    const wasUpdated = UserModel.updateSendingSignalTitle(signalId, title);
+
+    if (wasUpdated) {
+        res.status(200).json(formatResponse(true, 200, 'Signal title updated successfully.'));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Signal not found.'));
+    }
+};
+
+// Deletes an entire sending signal group.
+const deleteSignal = (req, res) => {
+    const {
+        signalId
+    } = req.params;
+
+    const wasDeleted = UserModel.deleteSendingSignal(signalId);
+
+    if (wasDeleted) {
+        res.status(200).json(formatResponse(true, 200, 'Signal deleted successfully.'));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Signal not found.'));
+    }
+};
+
+// Adds a new button to an existing signal.
+const addButton = (req, res) => {
+    const {
+        signalId
+    } = req.params;
+    const {
+        title,
+        pinnumber,
+        sendingdata
+    } = req.body;
+
+    if (!title || !pinnumber || sendingdata === undefined) {
+        return res.status(400).json(formatResponse(false, 400, 'Fields "title", "pinnumber", and "sendingdata" are required.'));
+    }
+
+    const newButton = UserModel.addButtonToSignal(signalId, {
+        title,
+        pinnumber,
+        sendingdata
+    });
+
+    if (newButton) {
+        res.status(201).json(formatResponse(true, 201, 'Button added successfully!', {
+            button: newButton
+        }));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Signal not found.'));
+    }
+};
+
+// Updates an existing button's information.
+const updateButton = (req, res) => {
+    const {
+        buttonId
+    } = req.params;
+    const {
+        title,
+        pinnumber,
+        sendingdata
+    } = req.body;
+
+    if (!title && !pinnumber && sendingdata === undefined) {
+        return res.status(400).json(formatResponse(false, 400, 'At least one field to update is required.'));
+    }
+
+    const wasUpdated = UserModel.updateButtonById(buttonId, {
+        title,
+        pinnumber,
+        sendingdata
+    });
+
+    if (wasUpdated) {
+        res.status(200).json(formatResponse(true, 200, 'Button updated successfully.'));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Button not found.'));
+    }
+};
+
+// Deletes a button from a signal.
+const deleteButton = (req, res) => {
+    const {
+        buttonId
+    } = req.params;
+    const wasDeleted = UserModel.deleteButtonById(buttonId);
+
+    if (wasDeleted) {
+        res.status(200).json(formatResponse(true, 200, 'Button deleted successfully.'));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Button not found.'));
+    }
+};
+
+// Fetches all projects for a given user.
 const getUserProjects = (req, res) => {
     const {
         userId
@@ -35,7 +174,6 @@ const getUserProjects = (req, res) => {
     if (user) {
         const sortedProjects = (user.projects || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // Format the project data to include total sensor count
         const formattedProjects = sortedProjects.map(p => ({
             projectId: p.projectId,
             projectName: p.projectName,
@@ -58,6 +196,7 @@ const getUserProjects = (req, res) => {
     }
 };
 
+// Fetches a single project by its ID.
 const getProjectById = (req, res) => {
     const {
         projectId
@@ -73,6 +212,7 @@ const getProjectById = (req, res) => {
     }
 };
 
+// Updates a project's details.
 const updateProject = (req, res) => {
     const {
         projectId
@@ -103,6 +243,7 @@ const updateProject = (req, res) => {
     }
 };
 
+// Deletes a project by its ID.
 const deleteProjectById = (req, res) => {
     const {
         projectId
@@ -116,6 +257,7 @@ const deleteProjectById = (req, res) => {
     }
 };
 
+// Adds a new sensor to a project.
 const addSensorToProject = (req, res) => {
     const {
         projectId
@@ -139,6 +281,7 @@ const addSensorToProject = (req, res) => {
     }
 };
 
+// Updates a sensor's information.
 const updateSensorInfo = (req, res) => {
     const {
         sensorId
@@ -154,7 +297,6 @@ const updateSensorInfo = (req, res) => {
     if (typeOfPin) sensorData.typeOfPin = typeOfPin;
     if (pinNumber) sensorData.pinNumber = pinNumber;
 
-    // Validate input
     if (Object.keys(sensorData).length === 0) {
         return res.status(400).json(formatResponse(false, 400, 'At least one field (title, typeOfPin, pinNumber) is required.'));
     }
@@ -173,6 +315,7 @@ const updateSensorInfo = (req, res) => {
     }
 };
 
+// Fetches a single sensor by its ID.
 const getSensorById = (req, res) => {
     const {
         sensorId
@@ -180,7 +323,6 @@ const getSensorById = (req, res) => {
     const sensor = UserModel.findSensorById(sensorId);
 
     if (sensor) {
-        // Sort the data array by datetime in descending order
         if (sensor.data && Array.isArray(sensor.data)) {
             sensor.data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
         }
@@ -193,7 +335,7 @@ const getSensorById = (req, res) => {
     }
 };
 
-
+// Deletes a sensor by its ID.
 const deleteSensorById = (req, res) => {
     const {
         sensorId
@@ -207,6 +349,7 @@ const deleteSensorById = (req, res) => {
     }
 };
 
+// Updates the graph information for a sensor.
 const updateGraphInfo = (req, res) => {
     const {
         sensorId
@@ -230,14 +373,12 @@ const updateGraphInfo = (req, res) => {
         return res.status(400).json(formatResponse(false, 400, 'At least one graph info field is required.'));
     }
 
-    // --- Validation for graph type ---
     if (type) {
         const validTypes = ['line', 'bar', 'scatter', 'area', 'composed'];
         if (!validTypes.includes(type)) {
             return res.status(400).json(formatResponse(false, 400, `Invalid graph type. Must be one of: ${validTypes.join(', ')}.`));
         }
     }
-    // ------------------------------------
 
     const updatedSensor = UserModel.updateGraphInfoById(sensorId, graphData);
 
@@ -250,7 +391,7 @@ const updateGraphInfo = (req, res) => {
     }
 };
 
-
+// Fetches data for a project using its token.
 const getProjectData = (req, res) => {
     const {
         token
@@ -268,6 +409,12 @@ const getProjectData = (req, res) => {
 
 module.exports = {
     createProject,
+    createSendingSignal,
+    updateSignalTitle,
+    deleteSignal,
+    addButton,
+    updateButton,
+    deleteButton,
     getUserProjects,
     getProjectById,
     deleteProjectById,
@@ -277,6 +424,5 @@ module.exports = {
     getSensorById,
     deleteSensorById,
     updateGraphInfo,
-    getUserProjects,
     getProjectData,
 };

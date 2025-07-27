@@ -82,7 +82,7 @@
         "developmentBoard": "ESP32-S2",
         "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
         "createdAt": "2025-07-23T10:27:16.839Z",
-        "updatedAt": "2025-07-26T11:06:24.816Z",
+        "updatedAt": "2025-07-27T07:17:53.929Z",
         "sensordata": [
           {
             "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
@@ -91,13 +91,13 @@
             "pinNumber": "D4",
             "graphInfo": {
               "title": "Real-time DHT11",
-              "type": "area",
+              "type": "stacked",
               "maxDataPoints": 10,
               "xAxisLabel": "Time",
               "yAxisLabel": "Values"
             },
             "createdAt": "2025-07-23T10:46:26.949Z",
-            "updatedAt": "2025-07-26T11:06:24.816Z",
+            "updatedAt": "2025-07-27T05:55:13.527Z",
             "data": [
               {
                 "datetime": "2025-07-22T18:32:52.295Z",
@@ -137,16 +137,35 @@
               }
             ]
           }
+        ],
+        "sendingsignal": [
+          {
+            "signal": []
+          },
+          {
+            "signal": [
+              {
+                "id": "4c2356c2-455f-4da2-a080-76a4f38e0270",
+                "title": "button section",
+                "button": [
+                  {
+                    "id": "592f0870-0c3e-4997-b163-24abbc5d36a3",
+                    "title": "push button",
+                    "pinnumber": "D1",
+                    "sendingdata": "1"
+                  },
+                  {
+                    "id": "2bb56590-9128-4444-bcc8-953c93673c93",
+                    "title": "on off",
+                    "pinnumber": "D2",
+                    "sendingdata": "0"
+                  }
+                ]
+              }
+            ]
+          }
         ]
       }
     ]
-  },
-  {
-    "id": "6fe4eb8c-8933-4e93-bc41-a44ab23fc0e5",
-    "name": "Admin",
-    "email": "admin@gmail.com",
-    "phone": "0162719981",
-    "password": "12345678",
-    "projects": []
   }
 ]
