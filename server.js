@@ -18,7 +18,6 @@ const PORT = 3000;
 // Use the built-in Express middleware for parsing JSON bodies
 app.use(cors());
 app.use(express.json()); 
-app.use(express.static('public'));
 
 // --- API Routes ---
 app.use('/', apiRoutes);
