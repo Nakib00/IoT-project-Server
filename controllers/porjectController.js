@@ -110,12 +110,6 @@ const addButton = (req, res) => {
         pinnumber,
         sendingdata,
         releaseddata,
-        char,
-        action,
-        ondata,
-        offdata,
-        sensitivity,
-        defaultState
     } = req.body;
 
     if (!title || !type || !pinnumber) {
@@ -133,12 +127,6 @@ const addButton = (req, res) => {
         pinnumber,
         sendingdata,
         releaseddata,
-        char,
-        action,
-        ondata,
-        offdata,
-        sensitivity,
-        defaultState
     });
 
     if (newButton) {
