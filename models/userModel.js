@@ -535,6 +535,53 @@ const addDataToSensor = (token, payload) => {
     return projectFound;
 };
 
+// Updates an existing button's releaseddata after validation.
+const updateButtonAndValidateReleasedData = (buttonId, newReleasedData) => {
+    const users = readUsersDB();
+    let buttonFound = false;
+
+    for (const user of users) {
+        for (const project of user.projects) {
+            if (project.sendingsignal) {
+                for (const signalGroup of project.sendingsignal) {
+                    for (const signal of signalGroup.signal) {
+                        const button = signal.button?.find(b => b.id === buttonId);
+                        if (button) {
+                            // Validation: Check if newReleasedData is in the sendingdata array
+                            if (!button.sendingdata || !button.sendingdata.includes(newReleasedData)) {
+                                return {
+                                    success: false,
+                                    message: `Invalid input. The value for releaseddata must be one of: [${button.sendingdata.join(', ')}]`
+                                };
+                            }
+
+                            // Update the releaseddata
+                            button.releaseddata = newReleasedData;
+                            project.updatedAt = new Date().toISOString();
+                            buttonFound = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (buttonFound) break;
+        }
+        if (buttonFound) break;
+    }
+
+    if (buttonFound) {
+        writeUsersDB(users);
+        return {
+            success: true
+        };
+    }
+
+    return {
+        success: false,
+        message: 'Button not found.'
+    };
+};
+
 
 module.exports = {
     readUsersDB,
@@ -558,4 +605,5 @@ module.exports = {
     updateGraphInfoById,
     findProjectByToken,
     addDataToSensor,
+    updateButtonAndValidateReleasedData
 };

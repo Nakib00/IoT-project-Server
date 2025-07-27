@@ -35,6 +35,7 @@ router.delete('/delete-signal/:signalId', porjectController.deleteSignal);
 router.post('/signal/:signalId/add-button', porjectController.addButton);
 router.put('/button/:buttonId', porjectController.updateButton);
 router.delete('/button/:buttonId', porjectController.deleteButton);
+router.put('/button/:buttonId/releaseddata', porjectController.updateButtonReleasedData);
 
 
 module.exports = router;

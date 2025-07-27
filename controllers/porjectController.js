@@ -422,6 +422,29 @@ const getProjectData = (req, res) => {
     }
 };
 
+// Updates the releaseddata of a button by its ID.
+const updateButtonReleasedData = (req, res) => {
+    const {
+        buttonId
+    } = req.params;
+    const {
+        releaseddata
+    } = req.body;
+
+    if (typeof releaseddata === 'undefined') {
+        return res.status(400).json(formatResponse(false, 400, 'The "releaseddata" field is required.'));
+    }
+
+    const result = UserModel.updateButtonAndValidateReleasedData(buttonId, releaseddata);
+
+    if (result.success) {
+        res.status(200).json(formatResponse(true, 200, 'Button releaseddata updated successfully.'));
+    } else {
+        res.status(400).json(formatResponse(false, 400, result.message));
+    }
+};
+
+
 
 module.exports = {
     createProject,
@@ -441,4 +464,5 @@ module.exports = {
     deleteSensorById,
     updateGraphInfo,
     getProjectData,
+    updateButtonReleasedData
 };
