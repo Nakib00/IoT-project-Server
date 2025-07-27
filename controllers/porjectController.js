@@ -41,6 +41,14 @@ const createSendingSignal = (req, res) => {
         return res.status(400).json(formatResponse(false, 400, 'Request body must contain a title and a non-empty array of buttons.'));
     }
 
+    // Validate button types
+    const validButtonTypes = ['momentary', 'toggle', 'touch'];
+    for (const button of buttons) {
+        if (!validButtonTypes.includes(button.type)) {
+            return res.status(400).json(formatResponse(false, 400, `Invalid button type: ${button.type}. Must be one of 'momentary', 'toggle', or 'touch'.`));
+        }
+    }
+
     const newSignal = UserModel.createSendingSignalForProject(projectId, {
         title,
         buttons
@@ -54,7 +62,6 @@ const createSendingSignal = (req, res) => {
         res.status(404).json(formatResponse(false, 404, 'Project not found.'));
     }
 };
-
 // Updates the title of a sending signal.
 const updateSignalTitle = (req, res) => {
     const {
@@ -99,18 +106,39 @@ const addButton = (req, res) => {
     } = req.params;
     const {
         title,
+        type,
         pinnumber,
-        sendingdata
+        sendingdata,
+        releaseddata,
+        char,
+        action,
+        ondata,
+        offdata,
+        sensitivity,
+        defaultState
     } = req.body;
 
-    if (!title || !pinnumber || sendingdata === undefined) {
-        return res.status(400).json(formatResponse(false, 400, 'Fields "title", "pinnumber", and "sendingdata" are required.'));
+    if (!title || !type || !pinnumber) {
+        return res.status(400).json(formatResponse(false, 400, 'Fields "title", "type", and "pinnumber" are required.'));
+    }
+
+    const validButtonTypes = ['momentary', 'toggle', 'touch'];
+    if (!validButtonTypes.includes(type)) {
+        return res.status(400).json(formatResponse(false, 400, `Invalid button type: ${type}. Must be one of 'momentary', 'toggle', or 'touch'.`));
     }
 
     const newButton = UserModel.addButtonToSignal(signalId, {
         title,
+        type,
         pinnumber,
-        sendingdata
+        sendingdata,
+        releaseddata,
+        char,
+        action,
+        ondata,
+        offdata,
+        sensitivity,
+        defaultState
     });
 
     if (newButton) {
@@ -127,21 +155,21 @@ const updateButton = (req, res) => {
     const {
         buttonId
     } = req.params;
-    const {
-        title,
-        pinnumber,
-        sendingdata
-    } = req.body;
+    const buttonData = req.body;
 
-    if (!title && !pinnumber && sendingdata === undefined) {
+    if (Object.keys(buttonData).length === 0) {
         return res.status(400).json(formatResponse(false, 400, 'At least one field to update is required.'));
     }
 
-    const wasUpdated = UserModel.updateButtonById(buttonId, {
-        title,
-        pinnumber,
-        sendingdata
-    });
+    if (buttonData.type) {
+        const validButtonTypes = ['momentary', 'toggle', 'touch'];
+        if (!validButtonTypes.includes(buttonData.type)) {
+            return res.status(400).json(formatResponse(false, 400, `Invalid button type: ${buttonData.type}. Must be one of 'momentary', 'toggle', or 'touch'.`));
+        }
+    }
+
+
+    const wasUpdated = UserModel.updateButtonById(buttonId, buttonData);
 
     if (wasUpdated) {
         res.status(200).json(formatResponse(true, 200, 'Button updated successfully.'));

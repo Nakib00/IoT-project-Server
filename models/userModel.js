@@ -207,8 +207,16 @@ const createSendingSignalForProject = (projectId, signalData) => {
         button: signalData.buttons.map(button => ({
             id: uuidv4(),
             title: button.title,
+            type: button.type,
             pinnumber: button.pinnumber,
-            sendingdata: button.sendingdata
+            sendingdata: button.sendingdata,
+            releaseddata: button.releaseddata,
+            char: button.char,
+            action: button.action,
+            ondata: button.ondata,
+            offdata: button.offdata,
+            sensitivity: button.sensitivity,
+            defaultState: button.defaultState,
         }))
     };
 
@@ -301,9 +309,7 @@ const addButtonToSignal = (signalId, buttonData) => {
                     if (signal) {
                         newButton = {
                             id: uuidv4(),
-                            title: buttonData.title,
-                            pinnumber: buttonData.pinnumber,
-                            sendingdata: buttonData.sendingdata
+                            ...buttonData
                         };
                         signal.button.push(newButton);
                         project.updatedAt = new Date().toISOString();
@@ -325,6 +331,7 @@ const addButtonToSignal = (signalId, buttonData) => {
     return null;
 };
 
+
 // Updates an existing button's information by its ID.
 const updateButtonById = (buttonId, buttonData) => {
     const users = readUsersDB();
@@ -337,9 +344,7 @@ const updateButtonById = (buttonId, buttonData) => {
                     for (const signal of signalGroup.signal) {
                         const button = signal.button?.find(b => b.id === buttonId);
                         if (button) {
-                            if (buttonData.title) button.title = buttonData.title;
-                            if (buttonData.pinnumber) button.pinnumber = buttonData.pinnumber;
-                            if (buttonData.sendingdata) button.sendingdata = buttonData.sendingdata;
+                            Object.assign(button, buttonData)
                             project.updatedAt = new Date().toISOString();
                             buttonFound = true;
                             break;

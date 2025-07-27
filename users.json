@@ -82,7 +82,7 @@
         "developmentBoard": "ESP32-S2",
         "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
         "createdAt": "2025-07-23T10:27:16.839Z",
-        "updatedAt": "2025-07-27T07:17:53.929Z",
+        "updatedAt": "2025-07-27T08:38:25.098Z",
         "sensordata": [
           {
             "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
@@ -91,13 +91,13 @@
             "pinNumber": "D4",
             "graphInfo": {
               "title": "Real-time DHT11",
-              "type": "stacked",
-              "maxDataPoints": 10,
+              "type": "bar",
+              "maxDataPoints": 5,
               "xAxisLabel": "Time",
               "yAxisLabel": "Values"
             },
             "createdAt": "2025-07-23T10:46:26.949Z",
-            "updatedAt": "2025-07-27T05:55:13.527Z",
+            "updatedAt": "2025-07-27T08:09:57.441Z",
             "data": [
               {
                 "datetime": "2025-07-22T18:32:52.295Z",
@@ -143,22 +143,62 @@
             "signal": []
           },
           {
+            "signal": []
+          },
+          {
             "signal": [
               {
-                "id": "4c2356c2-455f-4da2-a080-76a4f38e0270",
+                "id": "5faad5dc-4800-470a-94d3-e84643b6ee1b",
                 "title": "button section",
                 "button": [
                   {
-                    "id": "592f0870-0c3e-4997-b163-24abbc5d36a3",
-                    "title": "push button",
+                    "id": "35ac43b5-ea73-45a6-b58e-0414e39ad966",
+                    "title": "Push Button",
+                    "type": "momentary",
                     "pinnumber": "D1",
-                    "sendingdata": "1"
+                    "sendingdata": "1",
+                    "releaseddata": "0",
+                    "char": "A",
+                    "action": "trigger"
                   },
                   {
-                    "id": "2bb56590-9128-4444-bcc8-953c93673c93",
-                    "title": "on off",
+                    "id": "616c620c-6a90-4426-a354-27cb952cc18b",
+                    "title": "Toggle Switch",
+                    "type": "toggle",
                     "pinnumber": "D2",
-                    "sendingdata": "0"
+                    "char": "B",
+                    "action": "control-light",
+                    "ondata": "ON",
+                    "offdata": "OFF",
+                    "defaultState": "off"
+                  },
+                  {
+                    "id": "4e4b53bc-e516-4235-b206-86f7e495b1a9",
+                    "title": "Touch Button",
+                    "type": "touch",
+                    "pinnumber": "T0",
+                    "sendingdata": "T",
+                    "action": "touch-toggle",
+                    "sensitivity": 40
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "signal": [
+              {
+                "id": "67654bdd-f1d1-406e-8b3a-cacf5e706e2d",
+                "title": "adfasd",
+                "button": [
+                  {
+                    "id": "27d22ed3-fb01-49bb-a326-48b4bd9180a8",
+                    "title": "fdf",
+                    "type": "touch",
+                    "pinnumber": "f0",
+                    "sendingdata": "f",
+                    "action": "touch-toggle",
+                    "sensitivity": 40
                   }
                 ]
               }
