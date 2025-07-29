@@ -15,6 +15,7 @@ router.get('/projects/:userId', porjectController.getUserProjects);
 router.get('/project/:projectId', porjectController.getProjectById);
 router.put('/update-project/:projectId', porjectController.updateProject);
 router.delete('/project/:projectId', porjectController.deleteProjectById);
+router.get('/project/:projectId/sensors', porjectController.getProjectSensors);
 
 // --- Sensor Management ---
 router.post('/add-sensor/:projectId', porjectController.addSensorToProject);

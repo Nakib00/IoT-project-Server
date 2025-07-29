@@ -465,12 +465,33 @@ const updateButtonReleasedData = (req, res) => {
     }
 };
 
+// Fetches all sensors for a given project.
+const getProjectSensors = (req, res) => {
+    const {
+        projectId
+    } = req.params;
+    const project = UserModel.findProjectById(projectId);
+
+    if (project) {
+        const sensors = project.sensordata.map(sensor => ({
+            id: sensor.id,
+            title: sensor.title,
+        }));
+        res.json(formatResponse(true, 200, 'Sensors fetched successfully', {
+            sensors
+        }));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Project not found.'));
+    }
+};
+
 
 
 module.exports = {
     createProject,
     createSendingSignal,
     updateSignalTitle,
+    getProjectSensors,
     deleteSignal,
     addButton,
     updateButton,

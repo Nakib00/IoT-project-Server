@@ -82,13 +82,13 @@
         "developmentBoard": "ESP32-S2",
         "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
         "createdAt": "2025-07-23T10:27:16.839Z",
-        "updatedAt": "2025-07-29T09:05:40.945Z",
+        "updatedAt": "2025-07-29T18:57:52.283Z",
         "sensordata": [
           {
             "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
             "title": "Temperature Sensor",
-            "typeOfPin": "Digital",
-            "pinNumber": "D4",
+            "typeOfPin": "Analog",
+            "pinNumber": "A1",
             "graphInfo": {
               "title": "Real-time DHT11",
               "type": "area",
@@ -97,7 +97,7 @@
               "yAxisLabel": "Values"
             },
             "createdAt": "2025-07-23T10:46:26.949Z",
-            "updatedAt": "2025-07-29T09:05:40.945Z",
+            "updatedAt": "2025-07-29T18:57:52.283Z",
             "data": [
               {
                 "datetime": "2025-07-22T18:32:52.295Z",
@@ -136,6 +136,59 @@
                 "value": 728.97
               }
             ]
+          },
+          {
+            "id": "3c1669ff-a631-4f6d-b478-0c7ab4ce6fd8",
+            "title": "Gas Senosr",
+            "typeOfPin": "Analog",
+            "pinNumber": "A0",
+            "graphInfo": {
+              "title": "Real-time Gas Senosr Data",
+              "type": "line",
+              "maxDataPoints": 10,
+              "xAxisLabel": "Time",
+              "yAxisLabel": "Value"
+            },
+            "createdAt": "2025-07-29T18:57:29.095Z",
+            "updatedAt": "2025-07-29T18:57:44.916Z",
+            "data": [
+              {
+                "datetime": "2025-07-22T18:32:52.295Z",
+                "value": 233.56
+              },
+              {
+                "datetime": "2025-07-22T18:33:02.316Z",
+                "value": 249.47
+              },
+              {
+                "datetime": "2025-07-22T18:33:12.265Z",
+                "value": 458.13
+              },
+              {
+                "datetime": "2025-07-22T18:33:22.297Z",
+                "value": 353.62
+              },
+              {
+                "datetime": "2025-07-22T18:33:32.334Z",
+                "value": 468.11
+              },
+              {
+                "datetime": "2025-07-22T18:33:42.368Z",
+                "value": 624.59
+              },
+              {
+                "datetime": "2025-07-22T18:33:52.300Z",
+                "value": 466.32
+              },
+              {
+                "datetime": "2025-07-22T18:34:02.336Z",
+                "value": 248.57
+              },
+              {
+                "datetime": "2025-07-22T18:34:12.374Z",
+                "value": 128.97
+              }
+            ]
           }
         ],
         "sendingsignal": [
@@ -170,9 +223,6 @@
                 ]
               }
             ]
-          },
-          {
-            "signal": []
           }
         ]
       }
