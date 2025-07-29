@@ -425,8 +425,12 @@ const getProjectData = (req, res) => {
 // Updates the releaseddata of a button by its ID.
 
 const updateButtonReleasedData = (req, res) => {
-    const { buttonId } = req.params;
-    const { releaseddata } = req.body;
+    const {
+        buttonId
+    } = req.params;
+    const {
+        releaseddata
+    } = req.body;
 
     if (typeof releaseddata === 'undefined') {
         return res.status(400).json(formatResponse(false, 400, 'The "releaseddata" field is required.'));
