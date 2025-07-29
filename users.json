@@ -82,7 +82,7 @@
         "developmentBoard": "ESP32-S2",
         "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
         "createdAt": "2025-07-23T10:27:16.839Z",
-        "updatedAt": "2025-07-29T20:51:46.786Z",
+        "updatedAt": "2025-07-29T22:20:47.239Z",
         "sensordata": [
           {
             "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
@@ -228,7 +228,7 @@
         "convinesensorgraph": [
           {
             "id": "ceee642a-82b3-4abe-a444-d503ecd45b8e",
-            "title": "My Combined Temperature & Gas Graph",
+            "title": "Combined Temperature & Gas Graph",
             "sensors": [
               {
                 "sensorid": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
@@ -240,7 +240,7 @@
               }
             ],
             "convinegraphInfo": {
-              "title": "Combined: My Combined Temperature & Gas Graph",
+              "title": "Combined: Combined Temperature & Gas Graph",
               "type": "line",
               "maxDataPoints": 20,
               "xAxisLabel": "Time",

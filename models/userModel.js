@@ -871,10 +871,109 @@ const getCombinedGraphDataById = (graphId, options = {}) => {
     };
 };
 
+// Updates a combined graph's title and sensor list.
+const updateCombinedGraphById = (graphId, updateData) => {
+    const {
+        title,
+        sensorIds
+    } = updateData;
+    const users = readUsersDB();
+    let wasUpdated = false;
+    let updatedGraph = null;
+
+    for (const user of users) {
+        for (const project of user.projects || []) {
+            const graphIndex = project.convinesensorgraph?.findIndex(g => g.id === graphId);
+            if (graphIndex > -1) {
+                const graphToUpdate = project.convinesensorgraph[graphIndex];
+
+                // Update title if provided
+                if (title) {
+                    graphToUpdate.title = title;
+                    if (graphToUpdate.convinegraphInfo) {
+                        graphToUpdate.convinegraphInfo.title = `Combined: ${title}`;
+                    }
+                }
+
+                // Update sensor list if provided
+                if (sensorIds && Array.isArray(sensorIds)) {
+                    const projectSensors = project.sensordata || [];
+                    const newSensorList = [];
+                    for (const sId of sensorIds) {
+                        const sensorExists = projectSensors.find(ps => ps.id === sId);
+                        if (!sensorExists) {
+                            return {
+                                success: false,
+                                status: 400,
+                                message: `Sensor with ID "${sId}" does not exist in this project.`
+                            };
+                        }
+                        newSensorList.push({
+                            sensorid: sensorExists.id,
+                            sensorTitle: sensorExists.title
+                        });
+                    }
+                    graphToUpdate.sensors = newSensorList;
+                }
+
+                project.updatedAt = new Date().toISOString();
+                wasUpdated = true;
+                updatedGraph = graphToUpdate;
+                break;
+            }
+        }
+        if (wasUpdated) break;
+    }
+
+    if (!wasUpdated) {
+        return {
+            success: false,
+            status: 404,
+            message: 'Combined graph not found.'
+        };
+    }
+
+    writeUsersDB(users);
+    return {
+        success: true,
+        data: updatedGraph
+    };
+};
+
+// Deletes a combined graph by its ID.
+const deleteCombinedGraphById = (graphId) => {
+    const users = readUsersDB();
+    let wasDeleted = false;
+
+    for (const user of users) {
+        for (const project of user.projects || []) {
+            const graphIndex = project.convinesensorgraph?.findIndex(g => g.id === graphId);
+
+            if (graphIndex > -1) {
+                project.convinesensorgraph.splice(graphIndex, 1);
+                project.updatedAt = new Date().toISOString();
+                wasDeleted = true;
+                break;
+            }
+        }
+        if (wasDeleted) break;
+    }
+
+    if (wasDeleted) {
+        writeUsersDB(users);
+    }
+
+    return wasDeleted;
+};
+
+
 
 
 module.exports = {
     readUsersDB,
+    getCombinedGraphDataById,
+    updateCombinedGraphById,
+    deleteCombinedGraphById,
     getCombinedGraphDataById,
     findUserByEmail,
     findUserById,

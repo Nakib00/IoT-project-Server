@@ -549,6 +549,7 @@ const getCombinedGraphAverage = (req, res) => {
     res.status(200).json(formatResponse(true, 200, 'Average data calculated successfully!', result.data));
 };
 
+// Fetches and calculates data for a combined graph based on its settings.
 const getCombinedGraphData = (req, res) => {
     const {
         graphId
@@ -570,10 +571,55 @@ const getCombinedGraphData = (req, res) => {
     res.status(200).json(formatResponse(true, 200, 'Combined graph data fetched successfully!', result.data));
 };
 
+// Updates a combined graph's title and/or sensor list.
+const updateCombinedGraph = (req, res) => {
+    const {
+        graphId
+    } = req.params;
+    const {
+        title,
+        sensorIds
+    } = req.body;
+
+    if (!title && !sensorIds) {
+        return res.status(400).json(formatResponse(false, 400, 'Request body must contain either "title" or "sensorIds".'));
+    }
+
+    const result = UserModel.updateCombinedGraphById(graphId, {
+        title,
+        sensorIds
+    });
+
+    if (!result.success) {
+        return res.status(result.status || 404).json(formatResponse(false, result.status || 404, result.message));
+    }
+
+    res.status(200).json(formatResponse(true, 200, 'Combined graph updated successfully!', {
+        updatedGraph: result.data
+    }));
+};
+
+// Deletes a combined graph by its ID.
+const deleteCombinedGraph = (req, res) => {
+    const {
+        graphId
+    } = req.params;
+    const wasDeleted = UserModel.deleteCombinedGraphById(graphId);
+
+    if (wasDeleted) {
+        res.status(200).json(formatResponse(true, 200, 'Combined graph deleted successfully.'));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Combined graph not found.'));
+    }
+};
+
+
 
 module.exports = {
     createProject,
     getCombinedGraphData,
+    deleteCombinedGraph,
+    updateCombinedGraph,
     createSendingSignal,
     getCombinedGraphAverage,
     updateSignalTitle,

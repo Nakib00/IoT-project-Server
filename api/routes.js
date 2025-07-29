@@ -28,6 +28,8 @@ router.put('/update-graph-info/:sensorId', porjectController.updateGraphInfo);
 router.post('/project/:projectId/combine-sensors', porjectController.createCombinedSensorGraph);
 router.post('/combined-graph/:graphId/average', porjectController.getCombinedGraphAverage);
 router.get('/combined-graph/:graphId/data', porjectController.getCombinedGraphData);
+router.put('/combined-graph/:graphId', porjectController.updateCombinedGraph); 
+router.delete('/combined-graph/:graphId', porjectController.deleteCombinedGraph);
 
 
 // --- Data Retrieval ---
