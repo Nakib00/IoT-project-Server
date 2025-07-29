@@ -862,10 +862,13 @@ const getCombinedGraphDataById = (graphId, options = {}) => {
         });
     }
 
+    // --- THIS IS THE MODIFIED PART ---
+    // The response now includes the graph's configuration info.
     return {
         success: true,
         data: {
             graphTitle: combinedGraph.title,
+            convinegraphInfo: combinedGraph.convinegraphInfo, // <-- ADDED THIS LINE
             results: calculatedData
         }
     };
@@ -965,12 +968,53 @@ const deleteCombinedGraphById = (graphId) => {
 
     return wasDeleted;
 };
+// Updates the convinegraphInfo of a combined graph.
+const updateCombinedGraphInfoById = (graphId, newInfo) => {
+    const users = readUsersDB();
+    let wasUpdated = false;
+    let updatedGraphInfo = null;
 
+    for (const user of users) {
+        for (const project of user.projects || []) {
+            const graph = project.convinesensorgraph?.find(g => g.id === graphId);
 
+            if (graph) {
+                // Ensure convinegraphInfo exists
+                if (!graph.convinegraphInfo) {
+                    graph.convinegraphInfo = {};
+                }
+
+                // Merge the new data into the existing info
+                Object.assign(graph.convinegraphInfo, newInfo);
+
+                project.updatedAt = new Date().toISOString();
+                wasUpdated = true;
+                updatedGraphInfo = graph.convinegraphInfo;
+                break;
+            }
+        }
+        if (wasUpdated) break;
+    }
+
+    if (!wasUpdated) {
+        return {
+            success: false,
+            status: 404,
+            message: 'Combined graph not found.'
+        };
+    }
+
+    writeUsersDB(users);
+    return {
+        success: true,
+        data: updatedGraphInfo
+    };
+};
 
 
 module.exports = {
     readUsersDB,
+    updateCombinedGraphInfoById,
     getCombinedGraphDataById,
     updateCombinedGraphById,
     deleteCombinedGraphById,

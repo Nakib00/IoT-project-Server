@@ -30,6 +30,7 @@ router.post('/combined-graph/:graphId/average', porjectController.getCombinedGra
 router.get('/combined-graph/:graphId/data', porjectController.getCombinedGraphData);
 router.put('/combined-graph/:graphId', porjectController.updateCombinedGraph); 
 router.delete('/combined-graph/:graphId', porjectController.deleteCombinedGraph);
+router.put('/combined-graph/:graphId/info', porjectController.updateCombinedGraphInfo);
 
 
 // --- Data Retrieval ---

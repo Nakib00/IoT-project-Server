@@ -613,10 +613,45 @@ const deleteCombinedGraph = (req, res) => {
     }
 };
 
+// Updates the configuration of a combined graph.
+const updateCombinedGraphInfo = (req, res) => {
+    const {
+        graphId
+    } = req.params;
+    const graphInfoData = req.body;
+
+    if (Object.keys(graphInfoData).length === 0) {
+        return res.status(400).json(formatResponse(false, 400, 'Request body must contain at least one field to update.'));
+    }
+
+    // Optional: Add validation for specific fields if needed
+    if (graphInfoData.type) {
+        const validTypes = ['line', 'bar', 'scatter', 'area', 'composed'];
+        if (!validTypes.includes(graphInfoData.type)) {
+            return res.status(400).json(formatResponse(false, 400, `Invalid graph type. Must be one of: ${validTypes.join(', ')}.`));
+        }
+    }
+    if (graphInfoData.maxDataPoints && (typeof graphInfoData.maxDataPoints !== 'number' || graphInfoData.maxDataPoints <= 0)) {
+        return res.status(400).json(formatResponse(false, 400, 'maxDataPoints must be a positive number.'));
+    }
+
+
+    const result = UserModel.updateCombinedGraphInfoById(graphId, graphInfoData);
+
+    if (!result.success) {
+        return res.status(result.status || 404).json(formatResponse(false, result.status || 404, result.message));
+    }
+
+    res.status(200).json(formatResponse(true, 200, 'Combined graph info updated successfully!', {
+        updatedGraphInfo: result.data
+    }));
+};
+
 
 
 module.exports = {
     createProject,
+    updateCombinedGraphInfo,
     getCombinedGraphData,
     deleteCombinedGraph,
     updateCombinedGraph,
