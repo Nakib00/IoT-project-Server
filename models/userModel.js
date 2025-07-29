@@ -582,6 +582,25 @@ const updateButtonAndValidateReleasedData = (buttonId, newReleasedData) => {
     };
 };
 
+const findProjectByButtonId = (buttonId) => {
+    const users = readUsersDB();
+    for (const user of users) {
+        for (const project of user.projects || []) {
+            if (project.sendingsignal) {
+                for (const signalGroup of project.sendingsignal) {
+                    for (const signal of signalGroup.signal) {
+                        const button = signal.button?.find(b => b.id === buttonId);
+                        if (button) {
+                            return project; 
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return null;
+};
+
 
 module.exports = {
     readUsersDB,
@@ -605,5 +624,7 @@ module.exports = {
     updateGraphInfoById,
     findProjectByToken,
     addDataToSensor,
+    updateButtonAndValidateReleasedData,
+    findProjectByButtonId,
     updateButtonAndValidateReleasedData
 };

@@ -423,13 +423,10 @@ const getProjectData = (req, res) => {
 };
 
 // Updates the releaseddata of a button by its ID.
+
 const updateButtonReleasedData = (req, res) => {
-    const {
-        buttonId
-    } = req.params;
-    const {
-        releaseddata
-    } = req.body;
+    const { buttonId } = req.params;
+    const { releaseddata } = req.body;
 
     if (typeof releaseddata === 'undefined') {
         return res.status(400).json(formatResponse(false, 400, 'The "releaseddata" field is required.'));
@@ -438,6 +435,26 @@ const updateButtonReleasedData = (req, res) => {
     const result = UserModel.updateButtonAndValidateReleasedData(buttonId, releaseddata);
 
     if (result.success) {
+        // --- WebSocket Push ---
+        const wss = req.app.get('wss');
+        const project = UserModel.findProjectByButtonId(buttonId);
+
+        if (project && wss) {
+            wss.clients.forEach((client) => {
+                // Check if the client is authenticated and belongs to the correct project
+                if (client.readyState === WebSocket.OPEN && client.isAuthenticated && client.token === project.token) {
+                    const message = JSON.stringify({
+                        action: 'releaseddata_update',
+                        buttonId: buttonId,
+                        releaseddata: releaseddata
+                    });
+                    client.send(message);
+                    console.log(`Sent update to device for project token: ${project.token.substring(0, 8)}...`);
+                }
+            });
+        }
+        // --- End WebSocket Push ---
+
         res.status(200).json(formatResponse(true, 200, 'Button releaseddata updated successfully.'));
     } else {
         res.status(400).json(formatResponse(false, 400, result.message));

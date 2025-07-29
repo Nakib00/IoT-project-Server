@@ -82,7 +82,7 @@
         "developmentBoard": "ESP32-S2",
         "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
         "createdAt": "2025-07-23T10:27:16.839Z",
-        "updatedAt": "2025-07-27T15:17:11.508Z",
+        "updatedAt": "2025-07-27T17:24:07.727Z",
         "sensordata": [
           {
             "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
@@ -91,13 +91,13 @@
             "pinNumber": "D4",
             "graphInfo": {
               "title": "Real-time DHT11",
-              "type": "bar",
-              "maxDataPoints": 5,
+              "type": "composed",
+              "maxDataPoints": 50,
               "xAxisLabel": "Time",
               "yAxisLabel": "Values"
             },
             "createdAt": "2025-07-23T10:46:26.949Z",
-            "updatedAt": "2025-07-27T08:09:57.441Z",
+            "updatedAt": "2025-07-27T17:14:19.111Z",
             "data": [
               {
                 "datetime": "2025-07-22T18:32:52.295Z",
@@ -176,7 +176,7 @@
                       "1",
                       "0"
                     ],
-                    "releaseddata": "1"
+                    "releaseddata": "0"
                   }
                 ]
               }

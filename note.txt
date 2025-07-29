@@ -1,43 +1,60 @@
-My IoT Platform: ESP32 Connection Guide
-Last Updated: July 22, 2025
+🌐 Getting Started with Your IoT Project: A Step-by-Step Guide
+Welcome! 🚀 This guide will walk you through setting up your account, creating a project, and connecting your ESP32 device to send and visualize real-time sensor data on the platform.
 
-1. Introduction
-Welcome, ESP32 developer! This guide provides the exact steps to connect your ESP32-based IoT device to our platform. By following these instructions, you will be able to send sensor data from your device and have it stored and visualized in real-time.
+Step 1: Create Your Account and Log In
+First, you need an account to manage your projects.
 
-This guide assumes you have already been provided with the server address and a unique authentication token from the platform administrator.
+Register: Go to the homepage and fill in your details (Full Name, Email, Phone, Password) to create an account.
 
-2. Prerequisites
-Before you begin, ensure you have the following ready:
+Log In: After registering, go to the login page, enter your email and password, and you'll be taken to your personal dashboard.
 
-Hardware:
-An ESP32 development board.
+Step 2: Create Your First Project
+Your dashboard is where you'll manage all your IoT projects.
 
-The sensors you wish to connect (e.g., a DHT11 temperature sensor and a gas sensor).
+On your dashboard, click "Create a New Project".
 
-A Micro-USB cable.
+Fill in the project details:
 
-Software (on your computer):
-Arduino IDE installed.
+Project Name: A descriptive name (e.g., Home Weather Station).
 
-ESP32 Board Support configured in the Arduino IDE.
+Development Board: The hardware you're using (e.g., ESP32).
 
-The following Arduino libraries installed via the Library Manager:
+Description: A brief summary of your project.
+
+Click "Create Project". Your new project will now appear on your dashboard.
+
+Step 3: Add and Configure Sensors
+The server needs to know what sensors your device will be sending data from.
+
+Add a Sensor: In your project dashboard, find the option to "Add Sensor". You will be prompted to give the sensor a name (e.g., "Temperature").
+
+Configure the Pin Number: This is the most important step. After adding a sensor, you must configure it with the exact pin number your physical sensor is connected to on the ESP32 (e.g., A0, A1, D4). The server uses this pinNumber to match incoming data from your ESP32 to the correct sensor.
+
+Customize Graph (Optional): You can also customize the graph settings for each sensor, like the title, chart type (line, bar, etc.), and axis labels.
+
+Step 4: Get Your Project Credentials
+To connect your ESP32, you need three key pieces of information from your project dashboard.
+
+Your Wi-Fi Credentials: The SSID and password for your local Wi-Fi network.
+
+Server IP Address: The local IP address of the computer running the server. You can find this using ipconfig (Windows) or ifconfig (macOS/Linux).
+
+Authentication Token: A unique token generated for your project. Copy this from your project dashboard.
+
+Step 5: Program Your ESP32
+Now it's time to program your device to send data to the server.
+
+Prerequisites
+Before you start, make sure you have the following libraries installed in your Arduino IDE via the Library Manager:
 
 WebSockets by Markus Sattler
 
 ArduinoJson by Benoit Blanchon
 
-3. Connection Credentials
-To connect your device, you will need:
+Arduino Code
+Copy and paste the code below into a new Arduino sketch. This template is designed to read data from multiple sensors and send it to the server in the correct format.
 
-Your Wi-Fi Credentials: The SSID and password for your Wi-Fi network.
-
-The Server IP Address: The local IP address of the server (e.g., 192.168.0.100).
-
-Your Authentication Token: The unique token for your project from the dashboard.
-
-4. The Arduino Code
-Copy and paste the following code into a new sketch in your Arduino IDE. This code is the complete template for connecting and sending data from multiple sensors based on their pin numbers.
+C++
 
 #include <WiFi.h>
 #include <WebSocketsClient.h>
@@ -51,41 +68,40 @@ Copy and paste the following code into a new sketch in your Arduino IDE. This co
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
 
-// 2. Your Server's IP Address (find with 'ipconfig' or 'ifconfig')
-const char* websockets_host = "YOUR_COMPUTER_IP_ADDRESS"; 
-const uint16_t websockets_port = 3000;
+// 2. Your Server's IP Address and Port
+const char* websockets_host = "YOUR_COMPUTER_IP_ADDRESS"; //
+const uint16_t websockets_port = 3000; //
 
-// 3. Your Authentication Token (from your project dashboard)
-const char* authToken = "PASTE_YOUR_TOKEN_HERE";
-
+// 3. Your Authentication Token from the Dashboard
+const char* authToken = "PASTE_YOUR_TOKEN_HERE"; //
 // ===================================================
 
 WebSocketsClient webSocket;
 
-// Define the analog pins your sensors are connected to
-const int SENSOR_PIN_A0 = A0; // For DHT11 or similar
-const int SENSOR_PIN_A1 = A1; // For Gas sensor or similar
+// Define the pins your sensors are connected to.
+// These MUST match the pin numbers you set in the dashboard!
+const int SENSOR_PIN_A0 = A0; //
+const int SENSOR_PIN_A1 = A1; //
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
   switch(type) {
     case WStype_DISCONNECTED:
-      Serial.printf("[WSc] Disconnected!\n");
+      Serial.printf("[WSc] Disconnected!\n"); //
       break;
     case WStype_CONNECTED:
-      Serial.printf("[WSc] Connected to server!\n");
+      Serial.printf("[WSc] Connected to server!\n"); //
       // Send authentication token to the server
       {
         StaticJsonDocument<200> authDoc;
-        authDoc["token"] = authToken;
-        authDoc["action"] = "auth";
-        
+        authDoc["token"] = authToken; //
+        authDoc["action"] = "auth";   //
         String authString;
         serializeJson(authDoc, authString);
         webSocket.sendTXT(authString);
       }
       break;
     case WStype_TEXT:
-      Serial.printf("[WSc] Server response: %s\n", payload);
+      Serial.printf("[WSc] Server response: %s\n", payload); //
       break;
     default:
       break;
@@ -97,71 +113,108 @@ void setup() {
   delay(1000);
 
   // Set pin modes for your sensors
-  pinMode(SENSOR_PIN_A0, INPUT);
-  pinMode(SENSOR_PIN_A1, INPUT);
+  pinMode(SENSOR_PIN_A0, INPUT); //
+  pinMode(SENSOR_PIN_A1, INPUT); //
 
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid, password); //
   Serial.print("Connecting to WiFi...");
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED) { //
     delay(500);
     Serial.print(".");
   }
   Serial.println("\nWiFi Connected.");
   Serial.print("ESP32 IP Address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println(WiFi.localIP()); //
 
-  webSocket.begin(websockets_host, websockets_port, "/");
-  webSocket.onEvent(webSocketEvent);
-  webSocket.setReconnectInterval(5000);
+  webSocket.begin(websockets_host, websockets_port, "/"); //
+  webSocket.onEvent(webSocketEvent); //
+  webSocket.setReconnectInterval(5000); //
 }
 
 void loop() {
   webSocket.loop();
-
   static unsigned long lastSendTime = 0;
   if (millis() - lastSendTime > 10000) { // Send data every 10 seconds
     lastSendTime = millis();
-    if (webSocket.isConnected()) {
+    if (webSocket.isConnected()) { //
       // Read sensor values
-      float sensorValueA0 = analogRead(SENSOR_PIN_A0);
-      float sensorValueA1 = analogRead(SENSOR_PIN_A1);
+      float sensorValueA0 = analogRead(SENSOR_PIN_A0); //
+      float sensorValueA1 = analogRead(SENSOR_PIN_A1); //
       
       // Create JSON payload
       StaticJsonDocument<300> dataDoc;
-      dataDoc["token"] = authToken;
-      dataDoc["action"] = "data";
+      dataDoc["token"] = authToken;      //
+      dataDoc["action"] = "data";        //
       
-      JsonObject payload = dataDoc.createNestedObject("payload");
-      payload["A0"] = sensorValueA0;
-      payload["A1"] = sensorValueA1;
+      JsonObject payload = dataDoc.createNestedObject("payload"); //
+      payload["A0"] = sensorValueA0; // Use the pin name as the key
+      payload["A1"] = sensorValueA1; // Use the pin name as the key
       
       String dataString;
       serializeJson(dataDoc, dataString);
       
       webSocket.sendTXT(dataString);
-      Serial.printf("Sent data to server: %s\n", dataString.c_str());
+      Serial.printf("Sent data to server: %s\n", dataString.c_str()); //
     }
   }
 }
+Step 6: See Your Data in Real-Time
+Once your ESP32 is running and connected, it will start sending data to the server. The server receives this payload, finds the project matching the token, and saves the data to the sensor with the corresponding pin number.
 
-5. How It Works
-Configuration: Fill in your Wi-Fi details, server IP, and project token in the Arduino sketch.
+Go back to your project dashboard on the web interface. You will now see the data from your sensors being visualized in real-time on the graphs you configured. Congratulations!
 
-Pin Definitions: The code defines constants for the analog pins (A0, A1) that you've connected your sensors to.
+1. Payload from ESP32 to Server
+This is the combined message your ESP32 sends to the server every few seconds. It includes both sensor readings and the current state of your buttons.
 
-Data Transmission: Every 10 seconds, the loop() function reads the values from these pins.
+Action: device_update
 
-JSON Payload: It then constructs a JSON object that looks like this:
+This payload tells the server, "Here is the latest status of all my components."
+
+JSON
 
 {
-  "token": "your-token-goes-here",
-  "action": "data",
+  "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
+  "action": "device_update",
   "payload": {
-    "A0": 458.00,
-    "A1": 789.00
+    "sensors": {
+      "A0": 753.00,
+      "A1": 254.00
+    },
+    "buttons": {
+      "D5": "released"
+    }
   }
 }
+Breakdown of this payload:
 
-Server-Side Logic: The server receives this payload. It finds the project matching the token, then iterates through the payload object. For each key-value pair (e.g., "A0": 458.00), it finds the sensor with the matching pinNumber and saves the data.
+"token": Your project's unique authentication token.
 
-This new approach makes your project much more scalable and easier to manage, as the data from your device is now directly tied to the sensor configuration you set up in your dashboard.
+"action": "device_update": A custom action name indicating a full status update from the device.
+
+"payload": A container for all the data.
+
+"sensors": An object holding sensor data. The keys ("A0", "A1") match the pinNumber of the sensors in your project, and the server uses these keys to save the values correctly.
+
+"buttons": An object holding the state of any buttons connected to your ESP32. In this case, a button on pin D5 is currently not being pressed.
+
+2. Payload from Server to ESP32
+This is the real-time message the server sends to your ESP32 only when you change a button's releaseddata value through the API (for example, from your web dashboard).
+
+Action: releaseddata_update
+
+This payload tells the ESP32, "A setting has been changed on the dashboard. Update your state immediately."
+
+JSON
+
+{
+  "action": "releaseddata_update",
+  "buttonId": "a472579f-a3e3-4f3d-9951-ae4d54e02b35",
+  "releaseddata": "1"
+}
+Breakdown of this payload:
+
+"action": "releaseddata_update": A specific action so the ESP32 knows exactly what to do.
+
+"buttonId": The unique ID of the button whose state needs to change.
+
+"releaseddata": "1": The new value that the ESP32 should act upon. For example, you could use this to turn an LED on or off, spin a motor, or change a variable in your code.
