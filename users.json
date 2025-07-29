@@ -82,7 +82,7 @@
         "developmentBoard": "ESP32-S2",
         "token": "ff46724d-5a06-4340-8c38-58301eceb7ef",
         "createdAt": "2025-07-23T10:27:16.839Z",
-        "updatedAt": "2025-07-29T22:38:44.014Z",
+        "updatedAt": "2025-07-29T22:58:56.249Z",
         "sensordata": [
           {
             "id": "94e2dc40-bb89-4f46-a8a0-f7cac5d54245",
@@ -144,13 +144,13 @@
             "pinNumber": "A0",
             "graphInfo": {
               "title": "Real-time Gas Senosr Data",
-              "type": "bar",
+              "type": "violin",
               "maxDataPoints": 10,
               "xAxisLabel": "Time",
               "yAxisLabel": "Value"
             },
             "createdAt": "2025-07-29T18:57:29.095Z",
-            "updatedAt": "2025-07-29T22:35:28.338Z",
+            "updatedAt": "2025-07-29T22:57:47.618Z",
             "data": [
               {
                 "datetime": "2025-07-22T18:32:52.295Z",
@@ -241,7 +241,7 @@
             ],
             "convinegraphInfo": {
               "title": "Combined: Combined Temperature & Gas Graph",
-              "type": "line",
+              "type": "doughnut",
               "maxDataPoints": 20,
               "xAxisLabel": "Time",
               "yAxisLabel": "Values"

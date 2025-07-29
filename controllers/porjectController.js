@@ -411,7 +411,7 @@ const updateGraphInfo = (req, res) => {
     }
 
     if (type) {
-        const validTypes = ['line', 'bar', 'scatter', 'area', 'composed'];
+        const validTypes = ['line', 'bar', 'stackedBar', 'horizontalBar', 'area', 'stackedArea', 'scatter', 'bubble', 'pie', 'doughnut', 'composed', 'radar', 'polarArea', 'histogram', 'boxPlot', 'heatmap', 'violin', 'treemap', 'waterfall', 'funnel', 'gauge', 'candlestick', 'ohlc', 'sankey', 'choropleth', 'geoScatter'];
         if (!validTypes.includes(type)) {
             return res.status(400).json(formatResponse(false, 400, `Invalid graph type. Must be one of: ${validTypes.join(', ')}.`));
         }
@@ -626,7 +626,7 @@ const updateCombinedGraphInfo = (req, res) => {
 
     // Optional: Add validation for specific fields if needed
     if (graphInfoData.type) {
-        const validTypes = ['line', 'bar', 'scatter', 'area', 'composed'];
+        const validTypes = ['line', 'bar', 'stackedBar', 'horizontalBar', 'area', 'stackedArea', 'scatter', 'bubble', 'pie', 'doughnut', 'composed', 'radar', 'polarArea', 'histogram', 'boxPlot', 'heatmap', 'violin', 'treemap', 'waterfall', 'funnel', 'gauge', 'candlestick', 'ohlc', 'sankey', 'choropleth', 'geoScatter'];
         if (!validTypes.includes(graphInfoData.type)) {
             return res.status(400).json(formatResponse(false, 400, `Invalid graph type. Must be one of: ${validTypes.join(', ')}.`));
         }
