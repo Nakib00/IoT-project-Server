@@ -351,6 +351,27 @@ const getSensorById = (req, res) => {
     }
 };
 
+// Fetches all sensors for a given project.
+const getProjectSensors = (req, res) => {
+    const {
+        projectId
+    } = req.params;
+    const project = UserModel.findProjectById(projectId);
+
+    if (project) {
+        const sensors = (project.sensordata || []).map(sensor => ({
+            id: sensor.id,
+            title: sensor.title,
+        }));
+        res.json(formatResponse(true, 200, 'Sensors fetched successfully', {
+            sensors
+        }));
+    } else {
+        res.status(404).json(formatResponse(false, 404, 'Project not found.'));
+    }
+};
+
+
 // Deletes a sensor by its ID.
 const deleteSensorById = (req, res) => {
     const {
@@ -465,24 +486,29 @@ const updateButtonReleasedData = (req, res) => {
     }
 };
 
-// Fetches all sensors for a given project.
-const getProjectSensors = (req, res) => {
+// Creates a new combined sensor graph for a project.
+const createCombinedSensorGraph = (req, res) => {
     const {
         projectId
     } = req.params;
-    const project = UserModel.findProjectById(projectId);
+    const {
+        title,
+        sensorIds
+    } = req.body;
 
-    if (project) {
-        const sensors = project.sensordata.map(sensor => ({
-            id: sensor.id,
-            title: sensor.title,
-        }));
-        res.json(formatResponse(true, 200, 'Sensors fetched successfully', {
-            sensors
-        }));
-    } else {
-        res.status(404).json(formatResponse(false, 404, 'Project not found.'));
+    if (!title || !sensorIds || !Array.isArray(sensorIds) || sensorIds.length === 0) {
+        return res.status(400).json(formatResponse(false, 400, 'Request must include a "title" and a non-empty array of "sensorIds".'));
     }
+
+    const result = UserModel.createCombinedSensorGraphForProject(projectId, title, sensorIds);
+
+    if (!result.success) {
+        return res.status(result.status).json(formatResponse(false, result.status, result.message));
+    }
+
+    res.status(201).json(formatResponse(true, 201, 'Combined sensor graph created successfully!', {
+        combinedGraph: result.data
+    }));
 };
 
 
@@ -491,7 +517,6 @@ module.exports = {
     createProject,
     createSendingSignal,
     updateSignalTitle,
-    getProjectSensors,
     deleteSignal,
     addButton,
     updateButton,
@@ -503,8 +528,10 @@ module.exports = {
     addSensorToProject,
     updateSensorInfo,
     getSensorById,
+    getProjectSensors,
     deleteSensorById,
     updateGraphInfo,
     getProjectData,
-    updateButtonReleasedData
+    updateButtonReleasedData,
+    createCombinedSensorGraph
 };

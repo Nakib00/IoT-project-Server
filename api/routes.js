@@ -24,6 +24,9 @@ router.get('/sensor/:sensorId', porjectController.getSensorById);
 router.delete('/sensor/:sensorId', porjectController.deleteSensorById);
 router.put('/update-graph-info/:sensorId', porjectController.updateGraphInfo);
 
+// --- Combined Sensor Graph ---
+router.post('/project/:projectId/combine-sensors', porjectController.createCombinedSensorGraph);
+
 // --- Data Retrieval ---
 router.get('/data/:token', porjectController.getProjectData);
 

@@ -68,7 +68,8 @@ const createProjectForUser = (userId, projectData) => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         sensordata: [],
-        sendingsignal: []
+        sendingsignal: [],
+        convinesensorgraph: []
     };
 
     if (!users[userIndex].projects) {
@@ -591,7 +592,7 @@ const findProjectByButtonId = (buttonId) => {
                     for (const signal of signalGroup.signal) {
                         const button = signal.button?.find(b => b.id === buttonId);
                         if (button) {
-                            return project; 
+                            return project;
                         }
                     }
                 }
@@ -599,6 +600,75 @@ const findProjectByButtonId = (buttonId) => {
         }
     }
     return null;
+};
+
+// Creates a new combined sensor graph for a project.
+const createCombinedSensorGraphForProject = (projectId, title, sensorIds) => {
+    const users = readUsersDB();
+    let projectToUpdate = null;
+    let userOfProject = null;
+
+    for (const user of users) {
+        const project = user.projects?.find(p => p.projectId === projectId);
+        if (project) {
+            projectToUpdate = project;
+            userOfProject = user;
+            break;
+        }
+    }
+
+    if (!projectToUpdate) {
+        return {
+            success: false,
+            status: 404,
+            message: 'Project not found.'
+        };
+    }
+
+    const sensorsInProject = projectToUpdate.sensordata || [];
+    const includedSensors = [];
+
+    for (const sensorId of sensorIds) {
+        const sensor = sensorsInProject.find(s => s.id === sensorId);
+        if (!sensor) {
+            return {
+                success: false,
+                status: 400,
+                message: `Sensor with ID "${sensorId}" not found in this project.`
+            };
+        }
+        includedSensors.push({
+            sensorid: sensor.id,
+            sensorTitle: sensor.title
+        });
+    }
+
+    const newCombinedGraph = {
+        id: uuidv4(),
+        title: title,
+        sensors: includedSensors,
+        convinegraphInfo: {
+            title: `Combined: ${title}`,
+            type: 'line',
+            maxDataPoints: 20,
+            xAxisLabel: 'Time',
+            yAxisLabel: 'Values'
+        }
+    };
+
+    if (!projectToUpdate.convinesensorgraph) {
+        projectToUpdate.convinesensorgraph = [];
+    }
+
+    projectToUpdate.convinesensorgraph.push(newCombinedGraph);
+    projectToUpdate.updatedAt = new Date().toISOString();
+
+    writeUsersDB(users);
+
+    return {
+        success: true,
+        data: newCombinedGraph
+    };
 };
 
 
@@ -626,5 +696,6 @@ module.exports = {
     addDataToSensor,
     updateButtonAndValidateReleasedData,
     findProjectByButtonId,
-    updateButtonAndValidateReleasedData
+    updateButtonAndValidateReleasedData,
+    createCombinedSensorGraphForProject
 };
