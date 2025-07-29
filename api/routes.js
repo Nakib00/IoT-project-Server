@@ -26,6 +26,9 @@ router.put('/update-graph-info/:sensorId', porjectController.updateGraphInfo);
 
 // --- Combined Sensor Graph ---
 router.post('/project/:projectId/combine-sensors', porjectController.createCombinedSensorGraph);
+router.post('/combined-graph/:graphId/average', porjectController.getCombinedGraphAverage);
+router.get('/combined-graph/:graphId/data', porjectController.getCombinedGraphData);
+
 
 // --- Data Retrieval ---
 router.get('/data/:token', porjectController.getProjectData);

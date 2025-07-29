@@ -671,9 +671,211 @@ const createCombinedSensorGraphForProject = (projectId, title, sensorIds) => {
     };
 };
 
+// Finds the project and the combined graph object by the graph's ID.
+const findProjectByCombinedGraphId = (graphId) => {
+    const users = readUsersDB();
+    for (const user of users) {
+        for (const project of user.projects || []) {
+            const combinedGraph = project.convinesensorgraph?.find(g => g.id === graphId);
+            if (combinedGraph) {
+                return {
+                    user,
+                    project,
+                    combinedGraph
+                };
+            }
+        }
+    }
+    return {
+        user: null,
+        project: null,
+        combinedGraph: null
+    };
+};
+
+// Calculates the average for a combined sensor graph based on filter criteria.
+const calculateCombinedGraphAverage = (graphId, options) => {
+    const {
+        dataType,
+        value
+    } = options;
+
+    const {
+        project,
+        combinedGraph
+    } = findProjectByCombinedGraphId(graphId);
+
+    if (!project || !combinedGraph) {
+        return {
+            success: false,
+            status: 404,
+            message: 'Combined graph not found.'
+        };
+    }
+
+    const averageResults = [];
+    const allSensorsInProject = project.sensordata || [];
+    const sensorIdsInGraph = combinedGraph.sensors.map(s => s.sensorid);
+
+    for (const sensorId of sensorIdsInGraph) {
+        const sensor = allSensorsInProject.find(s => s.id === sensorId);
+        if (!sensor || !sensor.data || sensor.data.length === 0) {
+            averageResults.push({
+                sensorId: sensorId,
+                title: sensor ? sensor.title : 'Unknown Sensor',
+                average: 0,
+                note: 'Sensor not found or has no data.'
+            });
+            continue;
+        }
+
+        let dataToAverage = [];
+        const now = new Date();
+
+        switch (dataType) {
+            case 'realtime':
+                dataToAverage = sensor.data.slice(-1); // Get the last element
+                break;
+
+            case 'count':
+                dataToAverage = sensor.data.slice(-value); // Get the last 'value' elements
+                break;
+
+            case 'today':
+                const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+                dataToAverage = sensor.data.filter(d => new Date(d.datetime) >= startOfDay);
+                break;
+
+            case 'days':
+                const startDate = new Date(now);
+                startDate.setDate(now.getDate() - value);
+                dataToAverage = sensor.data.filter(d => new Date(d.datetime) >= startDate);
+                break;
+        }
+
+        let average = 0;
+        if (dataToAverage.length > 0) {
+            const sum = dataToAverage.reduce((acc, curr) => acc + curr.value, 0);
+            average = sum / dataToAverage.length;
+        }
+
+        averageResults.push({
+            sensorId: sensor.id,
+            title: sensor.title,
+            average: parseFloat(average.toFixed(2)) // Format to 2 decimal places
+        });
+    }
+
+    // --- Update the convinegraphInfo with the last used filter ---
+    if (combinedGraph.convinegraphInfo) {
+        combinedGraph.convinegraphInfo.lastFilter = {
+            dataType,
+            value: value || null,
+            queriedAt: new Date().toISOString()
+        };
+    }
+    // Find the user and project again to write the changes
+    const users = readUsersDB();
+    const user = users.find(u => u.id === project.ownerId); // Assuming you add an ownerId to projects
+    if (user) {
+        const projectIndex = user.projects.findIndex(p => p.projectId === project.projectId);
+        if (projectIndex !== -1) {
+            const graphIndex = user.projects[projectIndex].convinesensorgraph.findIndex(g => g.id === graphId);
+            if (graphIndex !== -1) {
+                user.projects[projectIndex].convinesensorgraph[graphIndex] = combinedGraph;
+                writeUsersDB(users);
+            }
+        }
+    }
+
+
+    return {
+        success: true,
+        data: {
+            graphTitle: combinedGraph.title,
+            averages: averageResults
+        }
+    };
+};
+
+// Fetches and calculates data for a combined graph by its ID.
+const getCombinedGraphDataById = (graphId, options = {}) => {
+    const {
+        startDate,
+        endDate
+    } = options;
+    const {
+        project,
+        combinedGraph
+    } = findProjectByCombinedGraphId(graphId);
+
+    if (!project || !combinedGraph) {
+        return {
+            success: false,
+            status: 404,
+            message: 'Combined graph not found.'
+        };
+    }
+
+    const maxDataPoints = combinedGraph.convinegraphInfo?.maxDataPoints || 10; // Default to 10 if not set
+    const calculatedData = [];
+    const allSensorsInProject = project.sensordata || [];
+    const sensorIdsInGraph = combinedGraph.sensors.map(s => s.sensorid);
+
+    for (const sensorId of sensorIdsInGraph) {
+        const sensor = allSensorsInProject.find(s => s.id === sensorId);
+        if (!sensor || !sensor.data || sensor.data.length === 0) {
+            calculatedData.push({
+                sensorId: sensorId,
+                title: sensor ? sensor.title : 'Unknown Sensor',
+                average: 0,
+                dataPointCount: 0,
+                note: 'Sensor not found or has no data.'
+            });
+            continue;
+        }
+
+        let filteredData = sensor.data;
+
+        // Apply date filtering if parameters are provided
+        if (startDate) {
+            filteredData = filteredData.filter(d => new Date(d.datetime) >= new Date(startDate));
+        }
+        if (endDate) {
+            filteredData = filteredData.filter(d => new Date(d.datetime) <= new Date(endDate));
+        }
+
+        // Get the last `maxDataPoints` from the (potentially filtered) data
+        const dataToAverage = filteredData.slice(-maxDataPoints);
+
+        let average = 0;
+        if (dataToAverage.length > 0) {
+            const sum = dataToAverage.reduce((acc, curr) => acc + curr.value, 0);
+            average = sum / dataToAverage.length;
+        }
+
+        calculatedData.push({
+            sensorId: sensor.id,
+            title: sensor.title,
+            average: parseFloat(average.toFixed(2)),
+            dataPointCount: dataToAverage.length
+        });
+    }
+
+    return {
+        success: true,
+        data: {
+            graphTitle: combinedGraph.title,
+            results: calculatedData
+        }
+    };
+};
+
+
 
 module.exports = {
     readUsersDB,
+    getCombinedGraphDataById,
     findUserByEmail,
     findUserById,
     findProjectById,
@@ -690,6 +892,7 @@ module.exports = {
     deleteProjectById,
     addSensor,
     updateSensorById,
+    calculateCombinedGraphAverage,
     deleteSensorById,
     updateGraphInfoById,
     findProjectByToken,

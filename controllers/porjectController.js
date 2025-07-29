@@ -486,6 +486,7 @@ const updateButtonReleasedData = (req, res) => {
     }
 };
 
+
 // Creates a new combined sensor graph for a project.
 const createCombinedSensorGraph = (req, res) => {
     const {
@@ -511,11 +512,70 @@ const createCombinedSensorGraph = (req, res) => {
     }));
 };
 
+// Calculates and returns the average data for a combined sensor graph.
+const getCombinedGraphAverage = (req, res) => {
+    const {
+        graphId
+    } = req.params;
+    const {
+        dataType,
+        value
+    } = req.body;
+
+    // --- Validation ---
+    if (!dataType) {
+        return res.status(400).json(formatResponse(false, 400, 'The "dataType" field is required.'));
+    }
+
+    const validDataTypes = ['count', 'days', 'today', 'realtime'];
+    if (!validDataTypes.includes(dataType)) {
+        return res.status(400).json(formatResponse(false, 400, `Invalid dataType. Must be one of: ${validDataTypes.join(', ')}.`));
+    }
+
+    if ((dataType === 'count' || dataType === 'days') && (typeof value !== 'number' || value <= 0)) {
+        return res.status(400).json(formatResponse(false, 400, `The "value" field must be a positive number for dataType '${dataType}'.`));
+    }
+    // --- End Validation ---
+
+    const result = UserModel.calculateCombinedGraphAverage(graphId, {
+        dataType,
+        value
+    });
+
+    if (!result.success) {
+        return res.status(result.status || 404).json(formatResponse(false, result.status || 404, result.message));
+    }
+
+    res.status(200).json(formatResponse(true, 200, 'Average data calculated successfully!', result.data));
+};
+
+const getCombinedGraphData = (req, res) => {
+    const {
+        graphId
+    } = req.params;
+    const {
+        startDate,
+        endDate
+    } = req.query; // Get optional query parameters
+
+    const result = UserModel.getCombinedGraphDataById(graphId, {
+        startDate,
+        endDate
+    });
+
+    if (!result.success) {
+        return res.status(result.status || 404).json(formatResponse(false, result.status || 404, result.message));
+    }
+
+    res.status(200).json(formatResponse(true, 200, 'Combined graph data fetched successfully!', result.data));
+};
 
 
 module.exports = {
     createProject,
+    getCombinedGraphData,
     createSendingSignal,
+    getCombinedGraphAverage,
     updateSignalTitle,
     deleteSignal,
     addButton,
