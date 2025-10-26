@@ -1,0 +1,73 @@
+[
+  {
+    "id": "38f25c69-3a8c-4b8a-ab63-01635569f647",
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "0123456789",
+    "password": "$2a$10$5DuCLnPBDvrzOPe6YAT1AuKZHmc2LRwUohDet.b6G/jhpGLctO/gW",
+    "projects": [
+      {
+        "projectId": "07c79ac9-2dce-4ebc-9fa5-ade579142238",
+        "projectName": "Greenhouse v2",
+        "description": "Updated description",
+        "developmentBoard": "ESP32-S3",
+        "token": "c6cd50ef-32b6-4d88-9837-a2a001fac898",
+        "createdAt": "2025-10-26T22:55:04.517Z",
+        "updatedAt": "2025-10-26T23:08:55.221Z",
+        "sensordata": [
+          {
+            "id": "ae5eba16-8db5-4ac9-a9d4-e42b18b80f45",
+            "title": "Temp",
+            "typeOfPin": "Analog",
+            "pinNumber": "A0",
+            "graphInfo": {
+              "title": "Temp (last 10)",
+              "type": "line",
+              "maxDataPoints": 10,
+              "xAxisLabel": "Time",
+              "yAxisLabel": "°C"
+            },
+            "createdAt": "2025-10-26T22:59:34.883Z",
+            "updatedAt": "2025-10-26T23:03:23.561Z",
+            "data": []
+          }
+        ],
+        "sendingsignal": [
+          {
+            "signal": [
+              {
+                "id": "43fb6a51-3919-4089-ac8a-049db96fa06b",
+                "title": "Relays",
+                "button": [
+                  {
+                    "id": "bba8c56b-f080-4283-be0a-d56b42cd1b35",
+                    "title": "Relay1",
+                    "type": "toggle",
+                    "pinnumber": "D5",
+                    "sendingdata": [
+                      "0",
+                      "1"
+                    ],
+                    "releaseddata": "0"
+                  },
+                  {
+                    "id": "2692ce22-9871-45a7-9f67-56abd5b39a15",
+                    "title": "Touch Button",
+                    "type": "touch",
+                    "pinnumber": "T0",
+                    "sendingdata": [
+                      "1",
+                      "0"
+                    ],
+                    "releaseddata": "1"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "convinesensorgraph": []
+      }
+    ]
+  }
+]

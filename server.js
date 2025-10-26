@@ -1,83 +1,83 @@
-const express = require('express');
+require('dotenv').config();
 const http = require('http');
 const WebSocket = require('ws');
-const apiRoutes = require('./api/routes');
-const UserModel = require('./models/userModel');
-const cors = require('cors');
+const os = require('os');                        
+const app = require('./src/app');
+const { PORT, WS_ENABLED } = require('./src/config/env');
 
-const app = express();
+function getLocalWsURLs(port) {
+  const nets = os.networkInterfaces();
+  const urls = [];
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name] || []) {
+      // Pick IPv4, non-internal (LAN) addresses
+      if (net.family === 'IPv4' && !net.internal) {
+        urls.push(`ws://${net.address}:${port}`);
+      }
+    }
+  }
+  // Always include localhost as a fallback
+  urls.push(`ws://127.0.0.1:${port}`);
+  return urls;
+}
+
 const server = http.createServer(app);
-const wss = new WebSocket.Server({
-    server
-});
 
-// Make the WebSocket Server (wss) accessible to other modules (like controllers)
-app.set('wss', wss);
+// Optional WebSocket server
+let wss = null;
+if (WS_ENABLED) {
+  wss = new WebSocket.Server({ server /*, path: '/ws'*/ });  // keep default path
+  app.set('wss', wss);
+  const UserModel = require('./src/models/userModel');
 
-const PORT = 3000;
+  wss.on('connection', (ws) => {
+    console.log('WS client connected');
 
-// --- Middleware ---
-// Use the built-in Express middleware for parsing JSON bodies
-app.use(cors());
-app.use(express.json());
+    ws.on('message', (msg) => {
+      try {
+        const incomingData = JSON.parse(msg);
 
-// --- API Routes ---
-app.use('/', apiRoutes);
-
-// --- WebSocket Server ---
-wss.on('connection', (ws) => {
-    console.log('Client connected to WebSocket');
-
-    ws.on('message', (message) => {
-        try {
-            const incomingData = JSON.parse(message);
-            console.log('Received from ESP32:', incomingData);
-
-            // 1. Handle Authentication
-            if (incomingData.token && incomingData.action === 'auth') {
-                if (UserModel.findProjectByToken(incomingData.token)) {
-                    ws.isAuthenticated = true;
-                    ws.token = incomingData.token;
-                    ws.send(JSON.stringify({
-                        status: 'authenticated'
-                    }));
-                    console.log(`Device authenticated: ${ws.token.substring(0, 8)}...`);
-                } else {
-                    ws.send(JSON.stringify({
-                        status: 'authentication failed'
-                    }));
-                    ws.terminate();
-                }
-            }
-            // 2. Handle Combined Sensor and Button Data
-            else if (ws.isAuthenticated && incomingData.action === 'device_update') {
-                const payload = incomingData.payload;
-
-                // If the payload contains sensor data, save it
-                if (payload.sensors) {
-                    const success = UserModel.addDataToSensor(ws.token, payload.sensors);
-                    if (success) {
-                        console.log(`Saved sensor data for project: ${ws.token.substring(0, 8)}...`);
-                    }
-                }
-
-                // If the payload contains button data, log it (or process it)
-                if (payload.buttons) {
-                    console.log(`Received button state for project: ${ws.token.substring(0, 8)}...`, payload.buttons);
-                    // You could add logic here to forward this button data to a web dashboard, for example.
-                }
-            }
-
-        } catch (error) {
-            console.error('Failed to process message:', error);
+        // authenticate device
+        if (incomingData.token && incomingData.action === 'auth') {
+          if (UserModel.findProjectByToken(incomingData.token)) {
+            ws.isAuthenticated = true;
+            ws.token = incomingData.token;
+            ws.send(JSON.stringify({ status: 'authenticated' }));
+            console.log(`WS device authenticated: ${ws.token.substring(0, 8)}...`);
+          } else {
+            ws.send(JSON.stringify({ status: 'authentication failed' }));
+            ws.terminate();
+          }
+          return;
         }
+
+        // receive device updates
+        if (ws.isAuthenticated && incomingData.action === 'device_update') {
+          const payload = incomingData.payload || {};
+          if (payload.sensors) {
+            const ok = UserModel.addDataToSensor(ws.token, payload.sensors);
+            if (ok) console.log(`Saved sensor data for project: ${ws.token.substring(0, 8)}...`);
+          }
+          if (payload.buttons) {
+            console.log(`Button state for ${ws.token.substring(0, 8)}...`, payload.buttons);
+          }
+        }
+      } catch (err) {
+        console.error('WS message error:', err);
+      }
     });
 
-    ws.on('close', () => console.log('Client disconnected'));
-});
+    ws.on('close', () => console.log('WS client disconnected'));
+  });
+}
 
-
-// --- Start Server ---
-server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`HTTP server up on http://localhost:${PORT}`);
+  if (WS_ENABLED) {
+    console.log('WebSocket server enabled');
+    const urls = getLocalWsURLs(PORT);
+    console.log('Use one of these WS URLs on your ESP:');
+    urls.forEach((u) => console.log(`  • ${u}`));
+    // If you later set a dedicated WS path, e.g. path:'/ws', append '/ws' to each printed URL.
+  }
 });
